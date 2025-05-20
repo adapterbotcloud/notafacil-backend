@@ -1,0 +1,27 @@
+spring:
+  profiles:
+    active: dev
+  threads:
+    virtual:
+      enabled: true
+server:
+  port: 8080
+nfse:
+  service:
+    url: ${NFSE_SERVICE_URL:http://isshomo.sefin.fortaleza.ce.gov.br/grpfor-iss/ServiceGinfesImplService}
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+logging:
+  level:
+    org.springframework.ws.client.MessageTracing: TRACE
+    org.springframework.ws.client.core.WebServiceTemplate: TRACE
+xmlsign:
+  keystore:
+    path: certs/keystore.p12
+    password: senha123
+    alias: testesign
+    keyPassword: senha123
+
