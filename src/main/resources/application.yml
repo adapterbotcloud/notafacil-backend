@@ -4,6 +4,12 @@ spring:
   threads:
     virtual:
       enabled: true
+  jvm:
+    system-properties:
+      azure.keyvault.jca.certificates-refresh-interval-in-ms: 3600000
+      azure.keyvault.jca.keys-refresh-interval-in-ms: 3600000
+      azure.keyvault.jca.disable-challenge-resource-verification: true
+      azure.tokenCredentialCacheEnabled: true
 server:
   port: 8080
 nfse:
@@ -18,10 +24,22 @@ logging:
   level:
     org.springframework.ws.client.MessageTracing: TRACE
     org.springframework.ws.client.core.WebServiceTemplate: TRACE
-xmlsign:
-  keystore:
-    path: certs/keystore.p12
-    password: senha123
-    alias: testesign
-    keyPassword: senha123
+azure:
+  keyvault:
+    # Endpoint do seu Key Vault
+    url: ${AZURE_KEYVAULT_URL:https://notafacil.vault.azure.net/}
+    # Alias do certificado importado
+    cert:
+      alias: ${AZURE_KEYVAULT_CERT_ALIAS:cert-name}
+
+  client:
+    # Client ID (App Registration)
+    id: ${AZURE_CLIENT_ID:43871b9e-f3ac-4242-bd5b-4657fc4c75f0}
+    # Client Secret (App Registration)
+    secret: ${AZURE_CLIENT_SECRET:41U8Q~z82biyRhwN0MmYRdX0D9NwNUBYD1Tuhdgb}
+
+  tenant:
+    # Tenant ID do Azure AD
+    id: ${AZURE_TENANT_ID:7b538dd9-c7e7-49dd-a5a8-7cc757b13d0e}
+
 
