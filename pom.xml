@@ -8,14 +8,12 @@
     <artifactId>notafacil</artifactId>
     <version>1.0.0</version>
     <packaging>jar</packaging>
-
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
         <version>3.4.5</version>
         <relativePath/>
     </parent>
-
     <properties>
         <java.version>21</java.version>
         <jakarta.version>4.0.0</jakarta.version>
@@ -23,12 +21,22 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <mapstruct.version>1.5.5.Final</mapstruct.version>
     </properties>
-
     <dependencies>
-        <!-- Web, SOAP, validação, métricas e documentação -->
+        <!-- Web starter, mas removendo o Tomcat -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-starter-tomcat</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <!-- Adiciona o Jetty como servidor embutido -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-jetty</artifactId>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -68,6 +76,11 @@
             <artifactId>jaxws-rt</artifactId>
             <version>${jakarta.version}</version>
         </dependency>
+        <dependency>
+            <groupId>com.fasterxml.woodstox</groupId>
+            <artifactId>woodstox-core</artifactId>
+            <version>6.5.0</version>
+        </dependency>
         <!-- Jakarta Annotations (inclui PostConstruct etc.) -->
         <dependency>
             <groupId>jakarta.annotation</groupId>
@@ -77,7 +90,7 @@
         <dependency>
             <groupId>com.azure</groupId>
             <artifactId>azure-identity</artifactId>
-            <version>1.11.1</version>
+            <version>1.12.2</version>
         </dependency>
         <dependency>
             <groupId>com.azure</groupId>
@@ -116,7 +129,7 @@
             <plugin>
                 <groupId>com.sun.xml.ws</groupId>
                 <artifactId>jaxws-maven-plugin</artifactId>
-                <version>4.0.0</version>
+                <version>4.0.3</version>
                 <executions>
                     <execution>
                         <id>wsimport-nfse</id>
