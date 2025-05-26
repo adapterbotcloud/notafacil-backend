@@ -2,6 +2,8 @@ package com.notafacil.controller;
 
 import com.notafacil.dto.CabecalhoDto;
 import com.notafacil.dto.EnviarLoteRpsEnvioDto;
+import com.notafacil.schemas.ConsultarLoteRpsResposta;
+import com.notafacil.schemas.ConsultarSituacaoLoteRpsResposta;
 import com.notafacil.schemas.EnviarLoteRpsResposta;
 import com.notafacil.service.NfseService;
 import org.springframework.http.ResponseEntity;
@@ -22,5 +24,23 @@ public class NfseController {
     public ResponseEntity<EnviarLoteRpsResposta> recepcionar(@RequestBody EnviarLoteRpsEnvioDto dto) {
         CabecalhoDto cabecalhoDto = new CabecalhoDto("3","3");
         return ResponseEntity.ok(service.recepcionarLote(cabecalhoDto,dto));
+    }
+
+
+    @GetMapping("/consulta-situacao-lote-rps/{protocolo}")
+    public ResponseEntity<ConsultarSituacaoLoteRpsResposta> consultarSituacaoLoteRps(  @PathVariable("protocolo") String protocolo) {
+        CabecalhoDto cabecalhoDto = new CabecalhoDto("3","3");
+        ConsultarSituacaoLoteRpsResposta resp =
+                service.consultarSituacaoLoteRps(cabecalhoDto, protocolo);
+        return ResponseEntity.ok(resp);
+    }
+
+    @GetMapping("/consulta-lote-rps/{protocolo}")
+    public ResponseEntity<ConsultarLoteRpsResposta> consultarLoteRps(
+            @PathVariable("protocolo") String protocolo) {
+        CabecalhoDto cabecalhoDto = new CabecalhoDto("3","3");
+        ConsultarLoteRpsResposta resp =
+                service.consultarLoteRps(cabecalhoDto, protocolo);
+        return ResponseEntity.ok(resp);
     }
 }

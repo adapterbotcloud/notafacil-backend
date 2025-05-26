@@ -11,6 +11,15 @@ import java.util.List;
 public interface NfseMapper {
     @Mapping(target = "loteRps.listaRps", source = "loteRps.listaRps", qualifiedByName = "mapListaRps")
     EnviarLoteRpsEnvio toSchema(EnviarLoteRpsEnvioDto dto);
+
+    default EnviarLoteRpsEnvio toSchema(EnviarLoteRpsEnvioDto dto, String correlationId) {
+        EnviarLoteRpsEnvio envio = toSchema(dto);
+        if (envio.getLoteRps() != null) {
+            envio.getLoteRps().setId(correlationId);
+        }
+        return envio;
+    }
+
     @Mapping(target = "listaRps", source = "listaRps", qualifiedByName = "mapListaRps")
     TcLoteRps toSchema(LoteRpsDto dto);
     TcRps toSchema(RpsDto dto);
