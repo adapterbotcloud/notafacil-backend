@@ -97,6 +97,11 @@
             <artifactId>azure-security-keyvault-jca</artifactId>
             <version>2.10.1</version>
         </dependency>
+        <dependency>
+            <groupId>com.azure</groupId>
+            <artifactId>azure-security-keyvault-certificates</artifactId>
+            <version>4.4.0</version>
+        </dependency>
 
     </dependencies>
 
@@ -120,7 +125,7 @@
                                 <source>src/main/resources/xsd</source>
                             </sources>
                             <outputDirectory>${project.build.directory}/generated-sources/xjc</outputDirectory>
-                            <packageName>com.notafacil.schemas</packageName>
+                            <packageName>br.com.notafacil.schemas</packageName>
                         </configuration>
                     </execution>
                 </executions>
@@ -140,7 +145,7 @@
                                 <wsdlUrl>http://isshomo.sefin.fortaleza.ce.gov.br/grpfor-iss/ServiceGinfesImplService?wsdl</wsdlUrl>
                             </wsdlUrls>
                             <sourceDestDir>${project.build.directory}/generated-sources/jaxws</sourceDestDir>
-                            <packageName>com.notafacil.wsdl</packageName>
+                            <packageName>br.com.notafacil.wsdl</packageName>
                             <keep>true</keep>
                             <extension>true</extension>
                         </configuration>

@@ -1,10 +1,7 @@
-package com.notafacil.service;
+package br.com.notafacil.service;
 
-import com.azure.identity.ClientSecretCredential;
-import com.azure.identity.ClientSecretCredentialBuilder;
-import com.azure.security.keyvault.jca.KeyVaultJcaProvider;
-import jakarta.annotation.PostConstruct;
-import org.springframework.beans.factory.annotation.Value;
+
+import br.com.notafacil.strategy.CertificateAliasStrategy;
 import org.springframework.stereotype.Service;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -26,61 +23,28 @@ import javax.xml.transform.stream.StreamResult;
 import java.io.StringWriter;
 import java.security.KeyStore;
 import java.security.PrivateKey;
-import java.security.Security;
 import java.security.cert.X509Certificate;
 import java.util.Collections;
 
 @Service
 public class AzureVaultXmlSigningService {
 
-    @Value("${azure.keyvault.url}")
-    private String vaultUrl;
+    private final KeyStore keyStore;
+    private final CertificateAliasStrategy aliasStrategy;
 
-    @Value("${azure.client.id}")
-    private String clientId;
-
-    @Value("${azure.client.secret}")
-    private String clientSecret;
-
-    @Value("${azure.tenant.id}")
-    private String tenantId;
-
-    private PrivateKey privateKey;
-    private X509Certificate certificate;
-
-    @PostConstruct
-    public void init() throws Exception {
-        // 1) Configure credenciais e propriedades do sistema para JCA
-        ClientSecretCredential credential = new ClientSecretCredentialBuilder()
-                .clientId(clientId)
-                .clientSecret(clientSecret)
-                .tenantId(tenantId)
-                .build();
-
-        System.setProperty("azure.keyvault.uri", vaultUrl);
-        System.setProperty("azure.keyvault.tenant-id", tenantId);
-        System.setProperty("azure.keyvault.client-id", clientId);
-        System.setProperty("azure.keyvault.client-secret", clientSecret);
-
-        // 2) Registrar o JCA Provider (usa propriedades definidas)
-        var provider = new KeyVaultJcaProvider();
-        Security.addProvider(provider);
-
-        // 3) Carregar KeyStore do Key Vault via JCA
-        KeyStore ks = KeyStore.getInstance("AzureKeyVault");
-        ks.load(null, null);
-
-        // 4) Extrair chave privada e certificado
-        this.privateKey = (PrivateKey) ks.getKey(vaultUrl + "/keys/" + provider, null);
-        // Na verdade, basta usar alias que é o nome do certificado/import
-        this.privateKey = (PrivateKey) ks.getKey("27288254000103", null);
-        this.certificate = (X509Certificate) ks.getCertificate("27288254000103");
+    public AzureVaultXmlSigningService(KeyStore keyStore, CertificateAliasStrategy aliasStrategy) {
+        this.keyStore = keyStore;
+        this.aliasStrategy = aliasStrategy;
     }
 
     /**
      * Assina o XML de entrada (enveloped) e retorna o XML com <Signature> inserido.
      */
     public String signXml(String xml) throws Exception {
+        String alias = aliasStrategy.resolveAlias();
+        PrivateKey privateKey = (PrivateKey) keyStore.getKey(alias, null);
+        X509Certificate certificate = (X509Certificate) keyStore.getCertificate(alias);
+
         // 1) Parse do XML
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         dbf.setNamespaceAware(true);
@@ -137,6 +101,9 @@ public class AzureVaultXmlSigningService {
      * Assina o XML de entrada (enveloped) e retorna o XML com <Signature> inserido.
      */
     public String signXml(String xml,String idToSign) throws Exception {
+        String alias = aliasStrategy.resolveAlias();
+        PrivateKey privateKey = (PrivateKey) keyStore.getKey(alias, null);
+        X509Certificate certificate = (X509Certificate) keyStore.getCertificate(alias);
         // 1) Parse do XML
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         dbf.setNamespaceAware(true);

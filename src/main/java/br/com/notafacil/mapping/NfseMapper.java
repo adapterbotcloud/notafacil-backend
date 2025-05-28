@@ -1,7 +1,9 @@
-package com.notafacil.mapping;
+package br.com.notafacil.mapping;
 
-import com.notafacil.dto.*;
-import com.notafacil.schemas.*;
+import br.com.notafacil.dto.*;
+import br.com.notafacil.schemas.*;
+import br.com.notafacil.dto.*;
+import br.com.notafacil.schemas.*;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;

@@ -1,11 +1,11 @@
-package com.notafacil.controller;
+package br.com.notafacil.controller;
 
-import com.notafacil.dto.CabecalhoDto;
-import com.notafacil.dto.EnviarLoteRpsEnvioDto;
-import com.notafacil.schemas.ConsultarLoteRpsResposta;
-import com.notafacil.schemas.ConsultarSituacaoLoteRpsResposta;
-import com.notafacil.schemas.EnviarLoteRpsResposta;
-import com.notafacil.service.NfseService;
+import br.com.notafacil.dto.CabecalhoDto;
+import br.com.notafacil.dto.EnviarLoteRpsEnvioDto;
+import br.com.notafacil.schemas.ConsultarLoteRpsResposta;
+import br.com.notafacil.schemas.ConsultarSituacaoLoteRpsResposta;
+import br.com.notafacil.schemas.EnviarLoteRpsResposta;
+import br.com.notafacil.service.NfseService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 

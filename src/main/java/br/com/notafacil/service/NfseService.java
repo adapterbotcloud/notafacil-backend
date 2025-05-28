@@ -1,11 +1,12 @@
-package com.notafacil.service;
+package br.com.notafacil.service;
 
-import com.notafacil.dto.CabecalhoDto;
-import com.notafacil.dto.EnviarLoteRpsEnvioDto;
-import com.notafacil.schemas.*;
-import com.notafacil.mapping.NfseMapper;
-import com.notafacil.wsdl.ServiceGinfesImplServiceService;
-import com.notafacil.wsdl.ServiceGinfes;
+import br.com.notafacil.dto.CabecalhoDto;
+import br.com.notafacil.dto.EnviarLoteRpsEnvioDto;
+import br.com.notafacil.schemas.*;
+import br.com.notafacil.schemas.*;
+import br.com.notafacil.mapping.NfseMapper;
+import br.com.notafacil.wsdl.ServiceGinfesImplServiceService;
+import br.com.notafacil.wsdl.ServiceGinfes;
 import jakarta.xml.bind.JAXBContext;
 import jakarta.xml.bind.Marshaller;
 import jakarta.xml.bind.Unmarshaller;
@@ -22,7 +23,6 @@ public class NfseService {
     private final ServiceGinfes port;
     private final NfseMapper mapper;
     private final JAXBContext jaxbCtx;
-    //private final XmlSigningService xmlSigner;
     private final AzureVaultXmlSigningService xmlSigner;
 
     public NfseService(NfseMapper mapper, AzureVaultXmlSigningService xmlSigner) throws Exception {
@@ -71,8 +71,6 @@ public class NfseService {
 
             // 3) XML → XML Assinado
             String bodyXml = xmlSigner.signXml(unsignedXml,loteId);
-
-            // bodyXml = bodyXml.replaceFirst("^<\\?xml[^>]*\\?>", "");
 
             // --- Chamada RPC via JAX-WS stub ---
             String respostaXml = port.recepcionarLoteRpsV3(cabecalhoXml, bodyXml);

@@ -1,4 +1,4 @@
-package com.notafacil.dto;
+package br.com.notafacil.dto;
 
 import java.util.List;
 
