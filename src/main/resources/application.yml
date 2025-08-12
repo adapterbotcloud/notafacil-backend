@@ -4,6 +4,11 @@ spring:
   threads:
     virtual:
       enabled: true
+  datasource:
+    url: jdbc:postgresql://localhost:5432/rpsdb
+    username: rpsuser
+    password: rpsuser
+    driver-class-name: org.postgresql.Driver
   jvm:
     system-properties:
       azure.keyvault.jca.certificates-refresh-interval-in-ms: 3600000
@@ -12,6 +17,15 @@ spring:
       azure.tokenCredentialCacheEnabled: true
 server:
   port: 8080
+
+jpa:
+  hibernate:
+    ddl-auto: update
+  database-platform: org.hibernate.dialect.PostgreSQLDialect
+  show-sql: true
+  properties:
+    hibernate.format_sql: true
+
 nfse:
   service:
     url: ${NFSE_SERVICE_URL:http://isshomo.sefin.fortaleza.ce.gov.br/grpfor-iss/ServiceGinfesImplService}
@@ -27,19 +41,19 @@ logging:
 azure:
   keyvault:
     # Endpoint do seu Key Vault
-    url: ${AZURE_KEYVAULT_URL}
+    url: ${AZURE_KEYVAULT_URL:https://notafacil.vault.azure.net/}
     # Alias do certificado importado
     cert:
-      alias: ${AZURE_KEYVAULT_CERT_ALIAS}
+      alias: ${AZURE_KEYVAULT_CERT_ALIAS:cert-name}
 
   client:
     # Client ID (App Registration)
-    id: ${AZURE_CLIENT_ID}
+    id: ${AZURE_CLIENT_ID:43871b9e-f3ac-4242-bd5b-4657fc4c75f0}
     # Client Secret (App Registration)
-    secret: ${AZURE_CLIENT_SECRET}
+    secret: ${AZURE_CLIENT_SECRET:41U8Q~z82biyRhwN0MmYRdX0D9NwNUBYD1Tuhdgb}
 
   tenant:
     # Tenant ID do Azure AD
-    id: ${AZURE_TENANT_ID}
+    id: ${AZURE_TENANT_ID:7b538dd9-c7e7-49dd-a5a8-7cc757b13d0e}
 
 

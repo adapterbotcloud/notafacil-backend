@@ -8,6 +8,6 @@ public class DefaultCertificateAliasStrategy implements CertificateAliasStrategy
     @Override
     public String resolveAlias() {
         // Exemplo estático; substitua pela lógica real
-        return "27288254000103";
+        return "CNPJ27288254000103";
     }
 }

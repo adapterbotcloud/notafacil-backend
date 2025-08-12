@@ -1,5 +1,6 @@
 package br.com.notafacil.dto;
 
 public record RpsDto(
-    InfRpsDto infRps
+    InfRpsDto infRps,
+    Long id
 ) {}
