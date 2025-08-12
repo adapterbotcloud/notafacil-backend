@@ -1,5 +1,8 @@
 package br.com.notafacil.dto;
 
+import br.com.notafacil.dto.prestador.PrestadorDto;
+import br.com.notafacil.dto.tomador.TomadorDto;
+
 import java.time.LocalDateTime;
 
 public record InfRpsDto(

@@ -1,6 +1,6 @@
-# NotaFacil
+# NotaFacil Backend
 
-NotaFacil é uma aplicação Spring Boot para emissão de Notas Fiscais de Serviço Eletrônicas (NFS-e) para a cidade de Fortaleza, Ceará, Brasil.
+NotaFacil Backend é uma aplicação Spring Boot para emissão de Notas Fiscais de Serviço Eletrônicas (NFS-e) para a cidade de Fortaleza, Ceará, Brasil.
 
 ## Descrição
 
@@ -22,7 +22,7 @@ Esta aplicação fornece uma API REST que se comunica com o serviço SOAP da Pre
 ## Estrutura do Projeto
 
 ```
-notafacil/
+notafacil-backend/
 ├── src/
 │   ├── main/
 │   │   ├── java/
@@ -84,17 +84,17 @@ mvn clean package
 ### Execução Local
 
 ```bash
-java -jar target/notafacil-1.0.0.jar
+java -jar target/notafacil-backend-1.0.0.jar
 ```
 
 ### Execução com Docker
 
 ```bash
 # Construir a imagem
-docker build -t notafacil .
+docker build -t notafacil-backend .
 
 # Executar o container
-docker run -p 8080:8080 notafacil
+docker run -p 8080:8080 notafacil-backend
 ```
 
 ## Uso da API
@@ -192,4 +192,4 @@ http://localhost:8080/swagger-ui.html
 ## Licença
 
 Este projeto está licenciado sob a licença MIT - veja o arquivo LICENSE para detalhes.
-# notaFacil
+# notaFacil-backend

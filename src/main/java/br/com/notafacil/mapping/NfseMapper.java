@@ -1,8 +1,11 @@
 package br.com.notafacil.mapping;
 
 import br.com.notafacil.dto.*;
-import br.com.notafacil.schemas.*;
-import br.com.notafacil.dto.*;
+import br.com.notafacil.dto.prestador.PrestadorDto;
+import br.com.notafacil.dto.tomador.ContatoDto;
+import br.com.notafacil.dto.tomador.EnderecoDto;
+import br.com.notafacil.dto.tomador.IdentificacaoTomadorDto;
+import br.com.notafacil.dto.tomador.TomadorDto;
 import br.com.notafacil.schemas.*;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;

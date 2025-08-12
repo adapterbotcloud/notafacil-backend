@@ -1,4 +1,4 @@
-package br.com.notafacil.dto;
+package br.com.notafacil.dto.tomador;
 
 public record IdentificacaoTomadorDto(
     String cnpj,
