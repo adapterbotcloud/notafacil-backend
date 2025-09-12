@@ -2,6 +2,8 @@ package br.com.notafacil.dto;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Null;
+
 import java.math.BigDecimal;
 
 public record InfRpsRequestDto(
@@ -51,11 +53,11 @@ public record InfRpsRequestDto(
             @NotNull IdentificacaoTomadorRequest identificacaoTomador,
             @NotNull String razaoSocial,
             @Valid EnderecoRequest endereco,
-            @NotNull ContatoRequest contato
+            @Null ContatoRequest contato
     ) {
         public record IdentificacaoTomadorRequest(
-                @NotNull String cnpj,
-                @NotNull String inscricaoMunicipal
+                @NotNull String cpf,
+                @Null String inscricaoMunicipal
         ) { }
 
         public record EnderecoRequest(

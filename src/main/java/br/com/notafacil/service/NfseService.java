@@ -269,7 +269,8 @@ public class NfseService {
             // Mapeia TomadorDto, cuidando de endereco opcional
             InfRpsRequestDto.TomadorRequest tomadorReq = req.tomador();
             IdentificacaoTomadorDto idTomadorDto = new IdentificacaoTomadorDto(
-                    tomadorReq.identificacaoTomador().cnpj(),
+                    tomadorReq.identificacaoTomador().cpf(),
+                    null,
                     tomadorReq.identificacaoTomador().inscricaoMunicipal()
             );
             String razaoSocial = tomadorReq.razaoSocial();
@@ -287,11 +288,14 @@ public class NfseService {
                         e.cep()
                 );
             }
-
-            ContatoDto contatoDto = new ContatoDto(
-                    tomadorReq.contato().telefone(),
-                    tomadorReq.contato().email()
-            );
+            ContatoDto contatoDto = null;
+            if (tomadorReq.contato() != null) {
+                var c = tomadorReq.contato();
+                 contatoDto = new ContatoDto(
+                        c.telefone(),
+                        c.email()
+                );
+            }
 
             TomadorDto tomadorDto = new TomadorDto(
                     idTomadorDto,
