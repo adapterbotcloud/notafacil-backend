@@ -91,12 +91,23 @@ public class RpsEntity {
     @Column(name = "mensagem_erro", length = 2000)
     private String mensagemErro;
 
+    @Column(name = "tomador_cpf", length = 14)
+    private String tomadorCpf;
+
+    @Column(name = "tomador_razao_social", length = 115)
+    private String tomadorRazaoSocial;
+
+    @Column(name = "discriminacao", length = 2000)
+    private String discriminacao;
+
     /** Auditoria simples */
     @Column(name = "created_at", nullable = false)
     private OffsetDateTime createdAt;
 
     @Column(name = "updated_at", nullable = false)
     private OffsetDateTime updatedAt;
+
+
 
     public RpsEntity() {
     }
@@ -158,6 +169,8 @@ public class RpsEntity {
 
     // Getters e Setters
 
+
+
     public Long getId() { return id; }
 
     public Long getRequestId() { return requestId; }
@@ -198,6 +211,13 @@ public class RpsEntity {
 
     public String getMensagemErro() { return mensagemErro; }
     public void setMensagemErro(String mensagemErro) { this.mensagemErro = mensagemErro; }
+
+    public String getTomadorCpf() { return tomadorCpf; }
+    public void setTomadorCpf(String tomadorCpf) { this.tomadorCpf = tomadorCpf; }
+    public String getTomadorRazaoSocial() { return tomadorRazaoSocial; }
+    public void setTomadorRazaoSocial(String v) { this.tomadorRazaoSocial = v; }
+    public String getDiscriminacao() { return discriminacao; }
+    public void setDiscriminacao(String discriminacao) { this.discriminacao = discriminacao; }
 
     public OffsetDateTime getCreatedAt() { return createdAt; }
     public OffsetDateTime getUpdatedAt() { return updatedAt; }

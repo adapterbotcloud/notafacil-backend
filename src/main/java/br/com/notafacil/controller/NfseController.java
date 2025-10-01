@@ -5,6 +5,7 @@ import br.com.notafacil.schemas.ConsultarLoteRpsResposta;
 import br.com.notafacil.schemas.ConsultarSituacaoLoteRpsResposta;
 import br.com.notafacil.schemas.EnviarLoteRpsResposta;
 import br.com.notafacil.service.NfseService;
+import br.com.notafacil.service.NfseService1;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -15,10 +16,13 @@ import org.springframework.web.bind.annotation.*;
 @Validated
 public class NfseController {
 
+    private final NfseService1 service1;
+
     private final NfseService service;
 
 
-    public NfseController(NfseService service) {
+    public NfseController(NfseService1 service1, NfseService service) {
+        this.service1 = service1;
         this.service = service;
     }
 
@@ -59,14 +63,14 @@ public class NfseController {
      * Fluxo SINCRONO: persiste RPS -> envia à prefeitura -> atualiza status
      * Header obrigatório: X-Empresa-CNPJ
      */
-  /*  @PostMapping("/emitir-rps-teste")
+    @PostMapping("/emitir-rps-teste")
     public ResponseEntity<EmitirRpsResponse> emitirRpsSync(
             @RequestHeader("X-Empresa-CNPJ") String empresaCnpj,
             @RequestBody @Valid EmitirNotaMinRequest request) {
 
         var cabecalho = new CabecalhoDto("2.00", "2.00"); // ajuste se necessário
-        var resp = service.emitirSincrono(cabecalho, empresaCnpj, request.listaRps());
+        var resp = service1.emitirSincrono(cabecalho, empresaCnpj, request.listaRps());
         return ResponseEntity.ok(resp);
-    }*/
+    }
 
 }
