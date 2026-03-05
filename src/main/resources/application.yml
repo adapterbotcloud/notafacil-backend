@@ -5,10 +5,17 @@ spring:
     virtual:
       enabled: true
   datasource:
-    url: jdbc:postgresql://localhost:5432/rpsdb
+    url: jdbc:postgresql://localhost:5433/rpsdb
     username: postgres
     password: 123
     driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    show-sql: true
+    properties:
+      hibernate.format_sql: true
   jvm:
     system-properties:
       azure.keyvault.jca.certificates-refresh-interval-in-ms: 3600000
@@ -16,15 +23,9 @@ spring:
       azure.keyvault.jca.disable-challenge-resource-verification: true
       azure.tokenCredentialCacheEnabled: true
 server:
-  port: 8080
+  port: 8081
 
-jpa:
-  hibernate:
-    ddl-auto: update
-  database-platform: org.hibernate.dialect.PostgreSQLDialect
-  show-sql: true
-  properties:
-    hibernate.format_sql: true
+
 
 nfse:
   service:

@@ -43,6 +43,10 @@ public class RpsEntity {
     @Column(name = "request_id", nullable = false)
     private Long requestId;
 
+    /** ID da cobrança original (da planilha) - chave de deduplicação */
+    @Column(name = "id_cobranca", nullable = true)
+    private Long idCobranca;
+
     /** Número sequencial do RPS gerado */
     @Column(nullable = false, length = 30)
     private String numero;
@@ -221,4 +225,7 @@ public class RpsEntity {
 
     public OffsetDateTime getCreatedAt() { return createdAt; }
     public OffsetDateTime getUpdatedAt() { return updatedAt; }
+
+    public Long getIdCobranca() { return idCobranca; }
+    public void setIdCobranca(Long idCobranca) { this.idCobranca = idCobranca; }
 }

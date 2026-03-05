@@ -7,7 +7,8 @@ import jakarta.validation.constraints.Size;
 import java.math.BigDecimal;
 
 public record RpsMinRequestDto(
-        @NotNull Long id, // referência ao registro base no banco
+        @NotNull Long id,
+        Long idCobranca, // ID da cobrança na planilha (para deduplicação)
         @NotNull @Valid ServicoMin servico,
         @NotNull @Valid TomadorMin tomador
 ) {
@@ -18,7 +19,7 @@ public record RpsMinRequestDto(
     ) {}
 
     public record TomadorMin(
-            @NotNull @Size(min = 11, max = 14) String cpf, // só dígitos; você pode normalizar no service
+            @NotNull @Size(min = 11, max = 14) String cpf,
             @NotNull @Size(min = 1, max = 255) String razaoSocial
     ) {}
 }

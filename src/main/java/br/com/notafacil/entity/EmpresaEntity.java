@@ -14,6 +14,7 @@ import java.math.BigDecimal;
 )
 public class EmpresaEntity {
 
+        @Getter
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

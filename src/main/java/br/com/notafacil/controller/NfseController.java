@@ -1,6 +1,7 @@
 package br.com.notafacil.controller;
 
 import br.com.notafacil.dto.*;
+import br.com.notafacil.repository.UsuarioRepository;
 import br.com.notafacil.schemas.ConsultarLoteRpsResposta;
 import br.com.notafacil.schemas.ConsultarSituacaoLoteRpsResposta;
 import br.com.notafacil.schemas.EnviarLoteRpsResposta;
@@ -8,8 +9,14 @@ import br.com.notafacil.service.NfseService;
 import br.com.notafacil.service.NfseService1;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import br.com.notafacil.entity.EmpresaEntity;
+import br.com.notafacil.repository.RpsRepository;
+import br.com.notafacil.repository.EmpresaRepository;
+import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/v1/nfse")
@@ -17,13 +24,17 @@ import org.springframework.web.bind.annotation.*;
 public class NfseController {
 
     private final NfseService1 service1;
-
     private final NfseService service;
+    private final UsuarioRepository usuarioRepo;
+    private final RpsRepository rpsRepo;
+    private final EmpresaRepository empresaRepo;
 
-
-    public NfseController(NfseService1 service1, NfseService service) {
+    public NfseController(NfseService1 service1, NfseService service, UsuarioRepository usuarioRepo, RpsRepository rpsRepo, EmpresaRepository empresaRepo) {
         this.service1 = service1;
         this.service = service;
+        this.usuarioRepo = usuarioRepo;
+        this.rpsRepo = rpsRepo;
+        this.empresaRepo = empresaRepo;
     }
 
     @PostMapping("/recepcionar-lote-rps")
@@ -32,9 +43,9 @@ public class NfseController {
         return ResponseEntity.ok(service.recepcionarLote(cabecalhoDto,dto));
     }
 
-
     @GetMapping("/consulta-situacao-lote-rps/{protocolo}")
-    public ResponseEntity<ConsultarSituacaoLoteRpsResposta> consultarSituacaoLoteRps(  @PathVariable("protocolo") String protocolo) {
+    public ResponseEntity<ConsultarSituacaoLoteRpsResposta> consultarSituacaoLoteRps(
+            @PathVariable("protocolo") String protocolo) {
         CabecalhoDto cabecalhoDto = new CabecalhoDto("3","3");
         ConsultarSituacaoLoteRpsResposta resp =
                 service.consultarSituacaoLoteRps(cabecalhoDto, protocolo);
@@ -53,7 +64,6 @@ public class NfseController {
     @PostMapping("/emitir-rps")
     public ResponseEntity<Void> emitirRps(
             @RequestBody @Valid EmitirNotaRequest request) {
-
         CabecalhoDto cabecalho = new CabecalhoDto("2.00", "2.00");
         service.emitirRpsEmLotes(cabecalho, request.listaRps());
         return ResponseEntity.accepted().build();
@@ -61,16 +71,50 @@ public class NfseController {
 
     /**
      * Fluxo SINCRONO: persiste RPS -> envia à prefeitura -> atualiza status
-     * Header obrigatório: X-Empresa-CNPJ
+     * CNPJ é obtido do usuário autenticado (JWT)
+     * Fallback: header X-Empresa-CNPJ (para compatibilidade)
      */
     @PostMapping("/emitir-rps-teste")
     public ResponseEntity<EmitirRpsResponse> emitirRpsSync(
-            @RequestHeader("X-Empresa-CNPJ") String empresaCnpj,
-            @RequestBody @Valid EmitirNotaMinRequest request) {
+            @RequestHeader(value = "X-Empresa-CNPJ", required = false) String headerCnpj,
+            @RequestBody @Valid EmitirNotaMinRequest request,
+            Authentication auth) {
 
-        var cabecalho = new CabecalhoDto("2.00", "2.00"); // ajuste se necessário
+        // Pegar CNPJ do usuário logado; fallback pro header
+        String empresaCnpj = headerCnpj;
+        if (auth != null) {
+            var usuario = usuarioRepo.findByUsername(auth.getName());
+            if (usuario.isPresent()) {
+                empresaCnpj = usuario.get().getCnpj();
+            }
+        }
+
+        if (empresaCnpj == null || empresaCnpj.isBlank()) {
+            return ResponseEntity.badRequest().build();
+        }
+
+        var cabecalho = new CabecalhoDto("2.00", "2.00");
         var resp = service1.emitirSincrono(cabecalho, empresaCnpj, request.listaRps());
         return ResponseEntity.ok(resp);
     }
 
+    /**
+     * Retorna lista de idCobranca que já possuem RPS para a empresa do usuário logado
+     */
+    @PostMapping("/rps-existentes")
+    public ResponseEntity<?> verificarRpsExistentes(
+            @RequestBody List<Long> idCobrancas,
+            Authentication auth) {
+
+        if (auth == null) return ResponseEntity.status(401).build();
+
+        var usuario = usuarioRepo.findByUsername(auth.getName()).orElseThrow();
+        var empresa = empresaRepo.findByCnpj(usuario.getCnpj());
+        if (empresa.isEmpty()) {
+            return ResponseEntity.ok(List.of());
+        }
+
+        List<Long> existentes = rpsRepo.findIdCobrancasByEmpresaAndIds(empresa.get().getId(), idCobrancas);
+        return ResponseEntity.ok(existentes);
+    }
 }
