@@ -81,6 +81,14 @@ O sistema usa **JWT (JSON Web Token)** para autenticação.
 | Perfil | `ADMIN` |
 | CNPJ | `27288254000103` |
 
+### Perfis de Acesso
+
+| Perfil | Descrição |
+|--------|----------|
+| `ADMIN` | Acesso total — gerencia todos os usuários e empresas |
+| `GESTOR` | Gerencia usuários do mesmo CNPJ + envia certificado digital |
+| `USER` | Apenas usa o sistema (upload, emitir RPS) |
+
 > ⚠️ **Troque a senha padrão em produção!**
 
 ### Login
@@ -128,7 +136,7 @@ curl -H "Authorization: Bearer <token>" http://localhost:8081/api/v1/nfse/...
 | `POST` | `/api/v1/nfse/emitir-rps-teste` | Emite RPS síncrono (usa CNPJ do JWT) |
 | `POST` | `/api/v1/nfse/rps-existentes` | Verifica quais cobranças já possuem RPS |
 
-### Usuários (somente ADMIN)
+### Usuários (ADMIN e GESTOR)
 
 | Método | Endpoint | Descrição |
 |--------|----------|-----------|
@@ -138,7 +146,14 @@ curl -H "Authorization: Bearer <token>" http://localhost:8081/api/v1/nfse/...
 | `PUT` | `/api/v1/usuarios/{id}` | Atualizar usuário |
 | `DELETE` | `/api/v1/usuarios/{id}` | Remover usuário |
 
-### Certificado Digital
+### RPS (autenticados)
+
+| Método | Endpoint | Descrição |
+|--------|----------|-----------|
+| `GET` | `/api/v1/rps?ano=2025&mes=7` | Listar RPS com filtro por ano/mês da cobrança |
+| `GET` | `/api/v1/rps/resumo` | Resumo de RPS agrupado por ano/mês |
+
+### Certificado Digital (ADMIN e GESTOR)
 
 | Método | Endpoint | Descrição |
 |--------|----------|-----------|
@@ -185,6 +200,8 @@ curl -H "Authorization: Bearer <token>" http://localhost:8081/api/v1/nfse/...
 | `status` | INTEGER | 0=Pendente, 1=Enviando, 2=Enviado, 3=Falha |
 | `protocolo` | VARCHAR(60) | Protocolo da prefeitura |
 | `mensagem_erro` | VARCHAR(2000) | Mensagem de erro |
+| `mes_cobranca` | INTEGER | Mês da cobrança (planilha) |
+| `ano_cobranca` | INTEGER | Ano da cobrança (planilha) |
 | `created_at` | TIMESTAMP | Data de criação |
 
 ### Tabela `usuarios`
@@ -252,7 +269,7 @@ notafacil-api.adapterbot.cloud {
 
 ## 📌 Versão
 
-**v1.0.0** — MVP com autenticação JWT, emissão de RPS e deduplicação por idCobranca.
+**v1.1.0** — Perfil GESTOR, listagem de RPS com filtro por competência, geração de PDF.
 
 ## 📄 Licença
 
