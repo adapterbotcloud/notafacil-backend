@@ -4,6 +4,8 @@ import com.azure.identity.ClientSecretCredential;
 import com.azure.security.keyvault.certificates.CertificateClient;
 import com.azure.security.keyvault.certificates.CertificateClientBuilder;
 import com.azure.security.keyvault.jca.KeyVaultJcaProvider;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -14,6 +16,8 @@ import java.security.Security;
 
 @Configuration
 public class AzureKeyVaultConfig {
+
+    private static final Logger log = LoggerFactory.getLogger(AzureKeyVaultConfig.class);
 
     @Value("${azure.keyvault.url}")
     private String vaultUrl;
@@ -30,7 +34,6 @@ public class AzureKeyVaultConfig {
 
     @Bean
     public KeyVaultJcaProvider keyVaultProvider() {
-        // Ajusta as properties para o provider JCA
         System.setProperty("azure.keyvault.uri", vaultUrl);
         System.setProperty("azure.keyvault.client-id", clientId);
         System.setProperty("azure.keyvault.client-secret", clientSecret);
@@ -41,10 +44,21 @@ public class AzureKeyVaultConfig {
     }
 
     @Bean
-    public KeyStore azureKeyVaultKeyStore(KeyVaultJcaProvider provider) throws Exception {
-        KeyStore ks = KeyStore.getInstance("AzureKeyVault");
-        ks.load(null, null);
-        return ks;
+    public KeyStore azureKeyVaultKeyStore(KeyVaultJcaProvider provider) {
+        try {
+            KeyStore ks = KeyStore.getInstance("AzureKeyVault");
+            ks.load(null, null);
+            return ks;
+        } catch (Exception e) {
+            log.warn("Azure Key Vault indisponível: {}. Certificado digital não funcionará.", e.getMessage());
+            try {
+                KeyStore ks = KeyStore.getInstance(KeyStore.getDefaultType());
+                ks.load(null, null);
+                return ks;
+            } catch (Exception ex) {
+                throw new RuntimeException("Falha ao criar KeyStore fallback", ex);
+            }
+        }
     }
 
     @Bean

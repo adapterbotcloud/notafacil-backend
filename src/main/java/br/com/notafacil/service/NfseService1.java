@@ -85,11 +85,30 @@ public class NfseService1 {
        ========================================================= */
     @Transactional
     public List<Long> persistirRpsMinimos(final EmpresaEntity empresa, final List<RpsMinRequestDto> listaMin) {
-        final int n = listaMin.size();
+        // Deduplicação: filtrar idCobrancas que já existem no banco
+        final List<Long> idsCobranca = listaMin.stream()
+                .map(RpsMinRequestDto::idCobranca)
+                .filter(id -> id != null && id > 0)
+                .distinct()
+                .collect(java.util.stream.Collectors.toList());
+
+        final java.util.Set<Long> jaExistem = idsCobranca.isEmpty()
+                ? java.util.Collections.emptySet()
+                : new java.util.HashSet<>(rpsRepository.findIdCobrancasByEmpresaAndIds(empresa.getId(), idsCobranca));
+
+        final List<RpsMinRequestDto> novos = listaMin.stream()
+                .filter(min -> min.idCobranca() == null || !jaExistem.contains(min.idCobranca()))
+                .collect(java.util.stream.Collectors.toList());
+
+        if (novos.isEmpty()) {
+            return java.util.Collections.emptyList();
+        }
+
+        final int n = novos.size();
         final List<RpsEntity> salvos = new ArrayList<>(n);
 
         for (int i = 0; i < n; i++) {
-            final RpsMinRequestDto min = listaMin.get(i);
+            final RpsMinRequestDto min = novos.get(i);
 
             final RpsEntity rps = new RpsEntity();
             rps.setEmpresa(empresa);
