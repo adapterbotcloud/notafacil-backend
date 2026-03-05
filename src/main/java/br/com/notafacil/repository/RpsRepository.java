@@ -14,4 +14,15 @@ public interface RpsRepository extends JpaRepository<RpsEntity, Long> {
 
     @Query("SELECT DISTINCT r.idCobranca FROM RpsEntity r WHERE r.empresa.id = :empresaId AND r.idCobranca IS NOT NULL")
     List<Long> findAllIdCobrancasByEmpresa(@Param("empresaId") Long empresaId);
+
+    List<RpsEntity> findByEmpresaId(Long empresaId);
+
+    @Query("SELECT r FROM RpsEntity r WHERE r.empresa.id = :empresaId AND YEAR(r.createdAt) = :ano AND MONTH(r.createdAt) = :mes ORDER BY r.createdAt DESC")
+    List<RpsEntity> findByEmpresaIdAndAnoMes(@Param("empresaId") Long empresaId, @Param("ano") int ano, @Param("mes") int mes);
+
+    @Query("SELECT r FROM RpsEntity r WHERE r.empresa.id = :empresaId AND YEAR(r.createdAt) = :ano ORDER BY r.createdAt DESC")
+    List<RpsEntity> findByEmpresaIdAndAno(@Param("empresaId") Long empresaId, @Param("ano") int ano);
+
+    @Query("SELECT YEAR(r.createdAt), MONTH(r.createdAt), COUNT(r) FROM RpsEntity r WHERE r.empresa.id = :empresaId GROUP BY YEAR(r.createdAt), MONTH(r.createdAt) ORDER BY YEAR(r.createdAt) DESC, MONTH(r.createdAt) DESC")
+    List<Object[]> findDistinctAnoMesByEmpresaId(@Param("empresaId") Long empresaId);
 }
