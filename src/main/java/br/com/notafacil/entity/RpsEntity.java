@@ -47,6 +47,14 @@ public class RpsEntity {
     @Column(name = "id_cobranca", nullable = true)
     private Long idCobranca;
 
+    /** Mês da cobrança (da planilha) */
+    @Column(name = "mes_cobranca", nullable = true)
+    private Integer mesCobranca;
+
+    /** Ano da cobrança (da planilha) */
+    @Column(name = "ano_cobranca", nullable = true)
+    private Integer anoCobranca;
+
     /** Número sequencial do RPS gerado */
     @Column(nullable = false, length = 30)
     private String numero;
@@ -228,4 +236,8 @@ public class RpsEntity {
 
     public Long getIdCobranca() { return idCobranca; }
     public void setIdCobranca(Long idCobranca) { this.idCobranca = idCobranca; }
+    public Integer getMesCobranca() { return mesCobranca; }
+    public void setMesCobranca(Integer mesCobranca) { this.mesCobranca = mesCobranca; }
+    public Integer getAnoCobranca() { return anoCobranca; }
+    public void setAnoCobranca(Integer anoCobranca) { this.anoCobranca = anoCobranca; }
 }

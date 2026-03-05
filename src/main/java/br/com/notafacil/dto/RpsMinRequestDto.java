@@ -8,7 +8,9 @@ import java.math.BigDecimal;
 
 public record RpsMinRequestDto(
         @NotNull Long id,
-        Long idCobranca, // ID da cobrança na planilha (para deduplicação)
+        Long idCobranca,
+        Integer mesCobranca,
+        Integer anoCobranca,
         @NotNull @Valid ServicoMin servico,
         @NotNull @Valid TomadorMin tomador
 ) {

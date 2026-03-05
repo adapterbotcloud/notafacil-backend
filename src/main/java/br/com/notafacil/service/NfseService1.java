@@ -113,6 +113,8 @@ public class NfseService1 {
             rps.setTomadorRazaoSocial(min.tomador().razaoSocial());
             rps.setDiscriminacao(min.servico().discriminacao());
             rps.setIdCobranca(min.idCobranca());
+            rps.setMesCobranca(min.mesCobranca());
+            rps.setAnoCobranca(min.anoCobranca());
 
             salvos.add(rps);
         }

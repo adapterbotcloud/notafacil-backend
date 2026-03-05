@@ -84,6 +84,8 @@ public class RpsController {
         map.put("status", r.getStatus());
         map.put("protocolo", r.getProtocolo());
         map.put("mensagemErro", r.getMensagemErro());
+        map.put("mesCobranca", r.getMesCobranca());
+        map.put("anoCobranca", r.getAnoCobranca());
         map.put("createdAt", r.getCreatedAt() != null ? r.getCreatedAt().toString() : null);
         return map;
     }
