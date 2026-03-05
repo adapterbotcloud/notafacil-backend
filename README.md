@@ -1,195 +1,259 @@
-# NotaFacil
+# 📝 NotaFácil - Backend
 
-NotaFacil é uma aplicação Spring Boot para emissão de Notas Fiscais de Serviço Eletrônicas (NFS-e) para a cidade de Fortaleza, Ceará, Brasil.
+Sistema de emissão de **NFS-e** (Nota Fiscal de Serviço Eletrônica) para a prefeitura de **Fortaleza/CE**.
 
-## Descrição
+## 🚀 Tecnologias
 
-Esta aplicação fornece uma API REST que se comunica com o serviço SOAP da Prefeitura de Fortaleza para emissão de NFS-e. Ela permite o envio de lotes de RPS (Recibo Provisório de Serviço) para conversão em NFS-e, incluindo a assinatura digital dos documentos XML conforme exigido pela legislação.
+- **Java 21** + **Spring Boot 3.4.5**
+- **Spring Security** + **JWT** (autenticação stateless)
+- **JPA/Hibernate** + **PostgreSQL**
+- **Jetty** (servidor HTTP)
+- **SOAP Client** (comunicação com SEFIN Fortaleza)
+- **Swagger/OpenAPI** (documentação da API)
+- **Maven** (build)
 
-## Tecnologias Utilizadas
+## 📋 Pré-requisitos
 
-- **Java 21**
-- **Spring Boot 3.4.5**
-- **Spring Web** (API REST)
-- **Spring Web Services** (Cliente SOAP)
-- **XML Digital Signatures** (Assinatura digital de XML)
-- **JAXB/JAXWS** (Processamento de XML e geração de classes a partir de XSD/WSDL)
-- **MapStruct** (Mapeamento de objetos)
-- **SpringDoc OpenAPI** (Documentação da API)
-- **Docker** (Containerização)
-- **Maven** (Gerenciamento de dependências e build)
+- Java 21+
+- Maven 3.9+
+- PostgreSQL 16+
 
-## Estrutura do Projeto
+## ⚙️ Configuração
 
-```
-notafacil/
-├── src/
-│   ├── main/
-│   │   ├── java/
-│   │   │   └── com/
-│   │   │       └── notafacil/
-│   │   │           ├── config/         # Configurações do Spring
-│   │   │           ├── controller/     # Controladores REST
-│   │   │           ├── dto/            # Objetos de transferência de dados
-│   │   │           ├── mapping/        # Mapeadores MapStruct
-│   │   │           ├── service/        # Serviços de negócio
-│   │   │           ├── wswrapper/      # Wrappers para serviços SOAP
-│   │   │           └── NotaFacilApplication.java  # Classe principal
-│   │   └── resources/
-│   │       ├── certs/                  # Certificados digitais
-│   │       ├── wsdl/                   # Arquivos WSDL
-│   │       ├── xsd/                    # Esquemas XSD
-│   │       └── application.yml         # Configuração da aplicação
-└── pom.xml                             # Configuração do Maven
+### Banco de Dados
+
+```sql
+CREATE DATABASE rpsdb;
 ```
 
-## Configuração
-
-A aplicação é configurada através do arquivo `application.yml`. As principais configurações são:
+### application.yml
 
 ```yaml
-nfse:
-  service:
-    url: ${NFSE_SERVICE_URL:http://isshomo.sefin.fortaleza.ce.gov.br/grpfor-iss/ServiceGinfesImplService}
-
-xmlsign:
-  keystore:
-    path: certs/keystore.p12
-    password: senha123
-    alias: testesign
-    keyPassword: senha123
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5433/rpsdb
+    username: postgres
+    password: 123
+  jpa:
+    hibernate:
+      ddl-auto: update
 ```
 
-### Certificado Digital
+### Cadastro inicial de empresa
 
-Para a assinatura digital dos XMLs, é necessário configurar um certificado digital válido:
-
-1. Coloque seu arquivo PKCS#12 (.p12 ou .pfx) no diretório `src/main/resources/certs/`
-2. Configure o caminho, senha e alias no arquivo `application.yml`
-
-## Instalação e Execução
-
-### Pré-requisitos
-
-- Java 21
-- Maven 3.8+
-- Docker (opcional)
-
-### Compilação
-
-```bash
-mvn clean package
+```sql
+INSERT INTO empresa (
+  cnpj, inscricao_municipal, regime_especial_tributacao,
+  optante_simples_nacional, incentivador_cultural,
+  item_lista_servico, codigo_tributacao_municipio,
+  codigo_municipio, aliquota
+) VALUES (
+  '27288254000103', '469159', 1, 1, 2,
+  '8.02', '859960401', '2304400', 0.05
+);
 ```
 
-### Execução Local
+## 🏃 Executando
 
 ```bash
+# Build
+mvn clean package -DskipTests
+
+# Executar
 java -jar target/notafacil-1.0.0.jar
+
+# Ou via Maven
+mvn spring-boot:run
 ```
 
-### Execução com Docker
+O servidor sobe na porta **8081** por padrão.
+
+## 🔐 Autenticação
+
+O sistema usa **JWT (JSON Web Token)** para autenticação.
+
+### Usuário padrão
+
+| Campo | Valor |
+|-------|-------|
+| Usuário | `admin` |
+| Senha | `admin123` |
+| Perfil | `ADMIN` |
+| CNPJ | `27288254000103` |
+
+> ⚠️ **Troque a senha padrão em produção!**
+
+### Login
 
 ```bash
-# Construir a imagem
-docker build -t notafacil .
-
-# Executar o container
-docker run -p 8080:8080 notafacil
+curl -X POST http://localhost:8081/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"username":"admin","password":"admin123"}'
 ```
 
-## Uso da API
-
-A API expõe um endpoint REST para envio de lotes de RPS:
-
-### Enviar Lote de RPS
-
-```
-POST /api/v1/nfse/recepcionar-lote-rps
-```
-
-Exemplo de payload:
-
+Resposta:
 ```json
 {
-  "loteRps": {
-    "id": 8171,
-    "numeroLote": "1234",
-    "cnpj": "01234567891234",
-    "inscricaoMunicipal": "123456",
-    "quantidadeRps": 5,
-    "listaRps": [
-      {
-        "infRps": {
-          "identificacaoRps": { "numero": "2", "serie": "A", "tipo": 1 },
-          "dataEmissao": "2025-05-01T08:15:00",
-          "naturezaOperacao": 1,
-          "regimeEspecialTributacao": 1,
-          "optanteSimplesNacional": 2,
-          "incentivadorCultural": 2,
-          "status": 1,
-          "servico": {
-            "valores": {
-              "valorServicos": 500.00,
-              "valorDeducoes": 0.00,
-              "valorPis": 0.00,
-              "valorCofins": 0.00,
-              "valorInss": 0.00,
-              "valorIr": 0.00,
-              "valorCsll": 0.00,
-              "issRetido": 2,
-              "valorIss": 25.00,
-              "valorIssRetido": 0.00,
-              "outrasRetencoes": 0.00,
-              "baseCalculo": 500.00,
-              "aliquota": 0.05,
-              "valorLiquidoNfse": 500.00,
-              "descontoIncondicionado": 0.00,
-              "descontoCondicionado": 0.00
-            },
-            "itemListaServico": "1.02",
-            "codigoTributacaoMunicipio": "010101010",
-            "discriminacao": "Serviço de consultoria",
-            "codigoMunicipio": "2304400"
-          },
-          "prestador": {
-            "cnpj": "01234567891234",
-            "inscricaoMunicipal": "123456"
-          },
-          "tomador": {
-            "identificacaoTomador": {
-              "cnpj": "98765432101234",
-              "inscricaoMunicipal": "654321"
-            },
-            "razaoSocial": "Cliente Exemplo 1",
-            "endereco": {
-              "endereco": "Av. Exemplo 1",
-              "numero": "100",
-              "bairro": "Centro",
-              "codigoMunicipio": "2304400",
-              "uf": "CE",
-              "cep": "60000001"
-            },
-            "contato": {
-              "telefone": "85900000001",
-              "email": "cliente1@exemplo.com"
-            }
-          }
-        }
-      }
-    ]
-  }
+  "token": "eyJhbG...",
+  "username": "admin",
+  "nome": "Administrador",
+  "role": "ADMIN",
+  "cnpj": "27288254000103"
 }
 ```
 
-## Documentação da API
+### Usando o token
 
-A documentação completa da API está disponível através do Swagger UI:
-
-```
-http://localhost:8080/swagger-ui.html
+```bash
+curl -H "Authorization: Bearer <token>" http://localhost:8081/api/v1/nfse/...
 ```
 
-## Licença
+## 📡 Endpoints
 
-Este projeto está licenciado sob a licença MIT - veja o arquivo LICENSE para detalhes.
-# notaFacil
+### Autenticação (públicos)
+
+| Método | Endpoint | Descrição |
+|--------|----------|-----------|
+| `POST` | `/auth/login` | Login — retorna token JWT |
+| `GET` | `/auth/me` | Dados do usuário logado |
+
+### NFS-e (autenticados)
+
+| Método | Endpoint | Descrição |
+|--------|----------|-----------|
+| `POST` | `/api/v1/nfse/recepcionar-lote-rps` | Envia lote de RPS para a prefeitura |
+| `GET` | `/api/v1/nfse/consulta-situacao-lote-rps/{protocolo}` | Consulta situação do lote |
+| `GET` | `/api/v1/nfse/consulta-lote-rps/{protocolo}` | Consulta detalhes do lote |
+| `POST` | `/api/v1/nfse/emitir-rps` | Emite RPS em lotes (assíncrono) |
+| `POST` | `/api/v1/nfse/emitir-rps-teste` | Emite RPS síncrono (usa CNPJ do JWT) |
+| `POST` | `/api/v1/nfse/rps-existentes` | Verifica quais cobranças já possuem RPS |
+
+### Usuários (somente ADMIN)
+
+| Método | Endpoint | Descrição |
+|--------|----------|-----------|
+| `GET` | `/api/v1/usuarios` | Listar usuários |
+| `GET` | `/api/v1/usuarios/{id}` | Buscar usuário por ID |
+| `POST` | `/api/v1/usuarios` | Criar usuário |
+| `PUT` | `/api/v1/usuarios/{id}` | Atualizar usuário |
+| `DELETE` | `/api/v1/usuarios/{id}` | Remover usuário |
+
+### Certificado Digital
+
+| Método | Endpoint | Descrição |
+|--------|----------|-----------|
+| `POST` | `/certificates/import` | Importar certificado (.p12/.pfx) |
+
+### Monitoramento (públicos)
+
+| Método | Endpoint | Descrição |
+|--------|----------|-----------|
+| `GET` | `/actuator/health` | Status da aplicação |
+| `GET` | `/swagger-ui.html` | Documentação interativa (Swagger) |
+
+## 🗄️ Modelo de Dados
+
+### Tabela `empresa`
+
+| Campo | Tipo | Descrição |
+|-------|------|-----------|
+| `id` | BIGINT | Chave primária |
+| `cnpj` | VARCHAR(14) | CNPJ da empresa (único) |
+| `inscricao_municipal` | VARCHAR(20) | Inscrição municipal |
+| `regime_especial_tributacao` | INTEGER | Regime de tributação |
+| `optante_simples_nacional` | INTEGER | Optante pelo Simples |
+| `incentivador_cultural` | INTEGER | Incentivador cultural |
+| `item_lista_servico` | VARCHAR(10) | Item da lista de serviços |
+| `codigo_tributacao_municipio` | VARCHAR(20) | Código de tributação |
+| `codigo_municipio` | VARCHAR(7) | Código IBGE do município |
+| `aliquota` | DECIMAL(10,6) | Alíquota ISS |
+
+### Tabela `rps`
+
+| Campo | Tipo | Descrição |
+|-------|------|-----------|
+| `id` | BIGINT | Chave primária |
+| `empresa_id` | BIGINT | FK → empresa |
+| `id_cobranca` | BIGINT | ID da cobrança na planilha (deduplicação) |
+| `request_id` | BIGINT | ID de referência do cliente |
+| `numero` | VARCHAR(30) | Número do RPS |
+| `serie` | VARCHAR(10) | Série do RPS |
+| `valor_servicos` | DECIMAL(13,2) | Valor dos serviços |
+| `tomador_cpf` | VARCHAR(14) | CPF do tomador |
+| `tomador_razao_social` | VARCHAR(115) | Nome do tomador |
+| `discriminacao` | VARCHAR(2000) | Descrição do serviço |
+| `status` | INTEGER | 0=Pendente, 1=Enviando, 2=Enviado, 3=Falha |
+| `protocolo` | VARCHAR(60) | Protocolo da prefeitura |
+| `mensagem_erro` | VARCHAR(2000) | Mensagem de erro |
+| `created_at` | TIMESTAMP | Data de criação |
+
+### Tabela `usuarios`
+
+| Campo | Tipo | Descrição |
+|-------|------|-----------|
+| `id` | BIGINT | Chave primária |
+| `username` | VARCHAR (único) | Login do usuário |
+| `password` | VARCHAR | Senha (BCrypt) |
+| `nome` | VARCHAR | Nome completo |
+| `cnpj` | VARCHAR(14) | CNPJ da empresa vinculada |
+| `role` | VARCHAR | Perfil: `ADMIN` ou `USER` |
+
+## 📁 Estrutura do Projeto
+
+```
+src/main/java/br/com/notafacil/
+├── config/          # DataLoader, configurações
+├── controller/      # AuthController, NfseController, UsuarioController
+├── dto/             # DTOs (request/response)
+├── entity/          # Entidades JPA (Empresa, RPS, Usuario)
+├── repository/      # Repositórios Spring Data
+├── schemas/         # Schemas SOAP (NFS-e)
+├── security/        # JWT, Filter, SecurityConfig
+├── service/         # Lógica de negócio (NfseService, NfseService1)
+└── strategy/        # Estratégias de alias de certificado
+```
+
+## 🌐 Deploy
+
+### Systemd
+
+```bash
+# Criar serviço
+sudo nano /etc/systemd/system/notafacil-backend.service
+
+# Conteúdo:
+[Unit]
+Description=NotaFacil Backend
+After=network.target postgresql.service
+
+[Service]
+Type=simple
+WorkingDirectory=/root/notafacil-backend
+ExecStart=/usr/bin/java -jar target/notafacil-1.0.0.jar
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
+
+# Ativar e iniciar
+sudo systemctl daemon-reload
+sudo systemctl enable notafacil-backend
+sudo systemctl start notafacil-backend
+```
+
+### Caddy (reverse proxy)
+
+```
+notafacil-api.adapterbot.cloud {
+    reverse_proxy localhost:8081
+}
+```
+
+## 📌 Versão
+
+**v1.0.0** — MVP com autenticação JWT, emissão de RPS e deduplicação por idCobranca.
+
+## 📄 Licença
+
+Projeto privado — uso interno.
