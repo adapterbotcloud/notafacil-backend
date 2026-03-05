@@ -1,65 +1,57 @@
-# Maven
-target/
-pom.xml.tag
-pom.xml.releaseBackup
-pom.xml.versionsBackup
-pom.xml.next
-release.properties
-dependency-reduced-pom.xml
-buildNumber.properties
-.mvn/timing.properties
-.mvn/wrapper/maven-wrapper.jar
-
-# IntelliJ IDEA
-.idea/
-*.iws
-*.iml
-*.ipr
-
-# Eclipse
-.classpath
-.project
-.settings/
-.factorypath
-
-# NetBeans
-/nbproject/private/
-/nbbuild/
-/dist/
-/nbdist/
-/.nb-gradle/
-build/
-
-# VS Code
-.vscode/
 
 # Compiled class file
-*.class
-
+# Eclipse
+# IntelliJ IDEA
 # Log file
-*.log
-
-# Package Files
-*.jar
-*.war
-*.nar
-*.ear
-*.zip
-*.tar.gz
-*.rar
-
-# virtual machine crash logs
-hs_err_pid*
-replay_pid*
-
+# Maven
+# NetBeans
 # OS specific files
+# Package Files
+# Temporary files
+# VS Code
+# virtual machine crash logs
+*.class
+*.ear
+*.iml
+*.ipr
+*.iws
+*.jar
+*.log
+*.nar
+*.rar
+*.tar.gz
+*.war
+*.zip
 .DS_Store
 .DS_Store?
-._*
 .Spotlight-V100
 .Trashes
-ehthumbs.db
-Thumbs.db
-
-# Temporary files
+._*
+.classpath
+.env
+.factorypath
+.idea/
+.mvn/timing.properties
+.mvn/wrapper/maven-wrapper.jar
 .output.txt
+.project
+.settings/
+.vscode/
+/.nb-gradle/
+/dist/
+/nbbuild/
+/nbdist/
+/nbproject/private/
+Thumbs.db
+build/
+buildNumber.properties
+dependency-reduced-pom.xml
+ehthumbs.db
+hs_err_pid*
+pom.xml.next
+pom.xml.releaseBackup
+pom.xml.tag
+pom.xml.versionsBackup
+release.properties
+replay_pid*
+target/

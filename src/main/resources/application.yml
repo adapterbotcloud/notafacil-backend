@@ -42,19 +42,19 @@ logging:
 azure:
   keyvault:
     # Endpoint do seu Key Vault
-    url: ${AZURE_KEYVAULT_URL:https://notafacil.vault.azure.net/}
+    url: ${AZURE_KEYVAULT_URL:}
     # Alias do certificado importado
     cert:
-      alias: ${AZURE_KEYVAULT_CERT_ALIAS:cert-name}
+      alias: ${AZURE_KEYVAULT_CERT_ALIAS:}
 
   client:
     # Client ID (App Registration)
-    id: ${AZURE_CLIENT_ID:43871b9e-f3ac-4242-bd5b-4657fc4c75f0}
+    id: ${AZURE_CLIENT_ID:}
     # Client Secret (App Registration)
-    secret: ${AZURE_CLIENT_SECRET:41U8Q~z82biyRhwN0MmYRdX0D9NwNUBYD1Tuhdgb}
+    secret: ${AZURE_CLIENT_SECRET:}
 
   tenant:
     # Tenant ID do Azure AD
-    id: ${AZURE_TENANT_ID:7b538dd9-c7e7-49dd-a5a8-7cc757b13d0e}
+    id: ${AZURE_TENANT_ID:}
 
 
