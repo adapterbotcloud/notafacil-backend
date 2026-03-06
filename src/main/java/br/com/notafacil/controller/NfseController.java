@@ -99,6 +99,29 @@ public class NfseController {
     }
 
     /**
+     * Reenviar RPS pendentes/falhos da empresa do usuário logado
+     */
+    @PostMapping("/reenviar-pendentes")
+    public ResponseEntity<?> reenviarPendentes(Authentication auth) {
+        if (auth == null) return ResponseEntity.status(401).build();
+
+        var usuario = usuarioRepo.findByUsername(auth.getName()).orElseThrow();
+        String empresaCnpj = usuario.getCnpj();
+
+        if (empresaCnpj == null || empresaCnpj.isBlank()) {
+            return ResponseEntity.badRequest().body(Map.of("error", "CNPJ não encontrado"));
+        }
+
+        try {
+            var cabecalho = new CabecalhoDto("2.00", "2.00");
+            var resp = service1.reenviarPendentes(cabecalho, empresaCnpj);
+            return ResponseEntity.ok(resp);
+        } catch (Exception e) {
+            return ResponseEntity.ok(Map.of("error", e.getMessage(), "reenviados", 0));
+        }
+    }
+
+    /**
      * Retorna lista de idCobranca que já possuem RPS para a empresa do usuário logado
      */
     @PostMapping("/rps-existentes")

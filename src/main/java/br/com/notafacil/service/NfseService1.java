@@ -72,12 +72,16 @@ public class NfseService1 {
         // 2) Converte/Enriquece e envia em lotes (assina + SOAP)
         final List<RpsEntity> entidades = rpsRepository.findAllById(rpsIds);
         final List<InfRpsRequestDto> completos = toInfRpsList(entidades);
-        final List<String> protocolos = emitirRpsEmLotes(cabecalho, completos);
-
-        // 3) Atualiza status/protocolo
-        atualizarStatusPosEnvio(rpsIds, protocolos);
-
-        return new EmitirRpsResponse(rpsIds, protocolos);
+        try {
+            final List<String> protocolos = emitirRpsEmLotes(cabecalho, completos);
+            // 3) Atualiza status/protocolo
+            atualizarStatusPosEnvio(rpsIds, protocolos);
+            return new EmitirRpsResponse(rpsIds, protocolos);
+        } catch (Exception e) {
+            // Salva motivo do erro nos RPS pendentes
+            marcarErroEnvio(rpsIds, e.getMessage());
+            throw e;
+        }
     }
 
     /* =========================================================
@@ -349,6 +353,54 @@ public class NfseService1 {
         // CORREÇÃO: O construtor de RpsDto esperava 2 argumentos (InfRpsDto e um Long).
         // Adicionado 'null' como segundo argumento.
         return new RpsDto(inf, null);
+    }
+
+    @Transactional
+    public void marcarErroEnvio(final List<Long> rpsIds, final String motivo) {
+        final List<RpsEntity> list = rpsRepository.findAllById(rpsIds);
+        for (RpsEntity rps : list) {
+            rps.setStatus(RpsEntity.Status.FALHA);
+            rps.setMensagemErro(motivo != null ? motivo : "Erro desconhecido no envio");
+        }
+        rpsRepository.saveAll(list);
+    }
+
+    /* =========================================================
+       REENVIAR PENDENTES/FALHAS
+       ========================================================= */
+    public EmitirRpsResponse reenviarPendentes(final CabecalhoDto cabecalho, final String empresaCnpj) {
+        final EmpresaEntity empresa = empresaService.getByCnpjOrThrow(empresaCnpj);
+
+        // Busca RPS com status PENDENTE(0) ou FALHA(3) sem protocolo
+        final List<RpsEntity> pendentes = rpsRepository.findAll().stream()
+                .filter(r -> r.getEmpresa().getId().equals(empresa.getId()))
+                .filter(r -> r.getStatus() == RpsEntity.Status.PENDENTE || r.getStatus() == RpsEntity.Status.FALHA)
+                .filter(r -> r.getProtocolo() == null || r.getProtocolo().isBlank())
+                .collect(java.util.stream.Collectors.toList());
+
+        if (pendentes.isEmpty()) {
+            return new EmitirRpsResponse(List.of(), List.of());
+        }
+
+        // Reset status para PENDENTE
+        final List<Long> rpsIds = new ArrayList<>();
+        for (RpsEntity rps : pendentes) {
+            rps.setStatus(RpsEntity.Status.PENDENTE);
+            rps.setMensagemErro(null);
+            rpsIds.add(rps.getId());
+        }
+        rpsRepository.saveAll(pendentes);
+
+        // Envia
+        final List<InfRpsRequestDto> completos = toInfRpsList(pendentes);
+        try {
+            final List<String> protocolos = emitirRpsEmLotes(cabecalho, completos);
+            atualizarStatusPosEnvio(rpsIds, protocolos);
+            return new EmitirRpsResponse(rpsIds, protocolos);
+        } catch (Exception e) {
+            marcarErroEnvio(rpsIds, e.getMessage());
+            throw e;
+        }
     }
 
     /* =========================================================
