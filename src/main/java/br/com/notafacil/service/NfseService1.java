@@ -175,9 +175,9 @@ public class NfseService1 {
         final BigDecimal valorServicos = base.getValorServicos();
         final BigDecimal aliquota      = emp.getAliquota();
 
-        final BigDecimal baseCalculo   = valorServicos;
-        final BigDecimal valorIss      = valorServicos.multiply(aliquota);
-        final BigDecimal valorLiquido  = valorServicos.subtract(valorIss);
+        final BigDecimal baseCalculo   = valorServicos.setScale(2, java.math.RoundingMode.HALF_UP);
+        final BigDecimal valorIss      = valorServicos.multiply(aliquota).setScale(2, java.math.RoundingMode.HALF_UP);
+        final BigDecimal valorLiquido  = valorServicos.subtract(valorIss).setScale(2, java.math.RoundingMode.HALF_UP);
 
         final InfRpsRequestDto.ServicoRequest.ValoresRequest valoresReq = new InfRpsRequestDto.ServicoRequest.ValoresRequest(
                 valorServicos, ZERO, ZERO, ZERO, ZERO, ZERO, ZERO,
@@ -186,7 +186,7 @@ public class NfseService1 {
                 ZERO,
                 ZERO,
                 baseCalculo,
-                aliquota,
+                aliquota.setScale(4, java.math.RoundingMode.HALF_UP),
                 valorLiquido,
                 ZERO, ZERO
         );
@@ -252,6 +252,8 @@ public class NfseService1 {
                 );
 
                 final String xmlAssinado = signer.signXml(xmlNaoAssinado);
+                log.info("XML NÃO ASSINADO:\n{}", xmlNaoAssinado);
+                log.info("XML ASSINADO:\n{}", xmlAssinado);
 
                 // CORREÇÃO: O método 'enviarLoteRpsV3' não foi encontrado. O método padrão do Ginfes é 'recepcionarLoteRpsV3'.
                 // Verifique o nome e os parâmetros corretos na sua classe ServiceGinfes gerada.
@@ -307,7 +309,7 @@ public class NfseService1 {
                         "A",
                         1
                 ),
-                dataEmissao,
+                dataEmissao != null ? dataEmissao.truncatedTo(java.time.temporal.ChronoUnit.SECONDS) : java.time.LocalDateTime.now().truncatedTo(java.time.temporal.ChronoUnit.SECONDS),
                 req.naturezaOperacao(),
                 req.regimeEspecialTributacao(),
                 req.optanteSimplesNacional(),

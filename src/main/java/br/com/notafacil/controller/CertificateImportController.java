@@ -20,6 +20,22 @@ public class CertificateImportController {
         this.certificateClient = certificateClient;
     }
 
+    @GetMapping("/check/{name}")
+    public ResponseEntity<?> checkCertificate(@PathVariable String name) {
+        try {
+            var cert = certificateClient.getCertificate(name);
+            var props = cert.getProperties();
+            return ResponseEntity.ok(java.util.Map.of(
+                "exists", true,
+                "name", name,
+                "createdOn", props.getCreatedOn() != null ? props.getCreatedOn().toString() : "",
+                "expiresOn", props.getExpiresOn() != null ? props.getExpiresOn().toString() : ""
+            ));
+        } catch (Exception e) {
+            return ResponseEntity.ok(java.util.Map.of("exists", false, "name", name));
+        }
+    }
+
     @PostMapping("/import")
     public ResponseEntity<String> importCertificate(
             @RequestParam("file") MultipartFile file,
