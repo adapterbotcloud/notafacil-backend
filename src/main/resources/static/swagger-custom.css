@@ -1,0 +1,9 @@
+.opblock-summary-path {
+  word-break: normal !important;
+  overflow-wrap: normal !important;
+  white-space: nowrap !important;
+  max-width: none !important;
+}
+.opblock-summary {
+  flex-wrap: nowrap !important;
+}

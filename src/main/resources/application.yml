@@ -71,3 +71,10 @@ springdoc:
   swagger-ui:
     enabled: true
     path: /swagger-ui.html
+    layout: BaseLayout
+    custom-css: /swagger-custom.css
+    defaultModelsExpandDepth: -1
+    operationsSorter: method
+  servers:
+    - url: https://notafacil-api.adapterbot.cloud
+      description: Produção
