@@ -6,6 +6,8 @@ import jakarta.validation.constraints.Null;
 
 import java.math.BigDecimal;
 
+import java.time.LocalDateTime;
+
 public record InfRpsRequestDto(
         @NotNull Long id,
         @NotNull Integer naturezaOperacao,
@@ -15,7 +17,8 @@ public record InfRpsRequestDto(
         @NotNull Integer status,
         @NotNull ServicoRequest servico,
         @NotNull PrestadorRequest prestador,
-        @NotNull TomadorRequest tomador
+        @NotNull TomadorRequest tomador,
+        LocalDateTime dataEmissao
 ) {
     public record ServicoRequest(
             @NotNull ValoresRequest valores,

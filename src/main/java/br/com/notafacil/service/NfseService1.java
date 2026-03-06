@@ -141,8 +141,8 @@ public class NfseService1 {
         rpsRepository.saveAllAndFlush(salvos);
 
         final List<Long> ids = new ArrayList<>(salvos.size());
-        for (RpsEntity salvo : salvos) { // CORREÇÃO: Loop aprimorado
-            ids.add(salvo.getId());
+        for (RpsEntity salvo : salvos) {
+            ids.add(salvo.getIdCobranca() != null ? salvo.getIdCobranca() : salvo.getId());
         }
         return ids;
     }
@@ -215,7 +215,8 @@ public class NfseService1 {
                 1,
                 servicoReq,
                 prestadorReq,
-                tomadorReq
+                tomadorReq,
+                base.getDataEmissao()
         );
     }
 
@@ -276,7 +277,7 @@ public class NfseService1 {
         final int n = batch.size();
         final List<RpsDto> rpsList = new ArrayList<>(n);
         for (int i = 0; i < n; i++) {
-            rpsList.add(toRpsDto(batch.get(i)));
+            rpsList.add(toRpsDto(batch.get(i), batch.get(i).dataEmissao()));
         }
 
         // CORREÇÃO: O construtor de LoteRpsDto esperava 6 argumentos, incluindo um Long id no início.
@@ -295,14 +296,14 @@ public class NfseService1 {
         return "1" + System.currentTimeMillis();
     }
 
-    private RpsDto toRpsDto(final InfRpsRequestDto req) {
+    private RpsDto toRpsDto(final InfRpsRequestDto req, final java.time.LocalDateTime dataEmissao) {
         final InfRpsDto inf = new InfRpsDto(
                 new IdentificacaoRpsDto(
                         req.id().toString(),
                         "A",
                         1
                 ),
-                java.time.LocalDateTime.now(),
+                dataEmissao,
                 req.naturezaOperacao(),
                 req.regimeEspecialTributacao(),
                 req.optanteSimplesNacional(),
