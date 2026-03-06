@@ -2,6 +2,7 @@ package br.com.notafacil.job;
 
 import br.com.notafacil.entity.RpsEntity;
 import br.com.notafacil.repository.RpsRepository;
+import br.com.notafacil.service.AzureVaultXmlSigningService;
 import br.com.notafacil.wsdl.ServiceGinfes;
 import br.com.notafacil.wsdl.ServiceGinfesImplServiceService;
 import org.slf4j.Logger;
@@ -19,11 +20,13 @@ public class ConsultaProtocoloJob {
 
     private final RpsRepository rpsRepository;
     private final JobStatusHolder jobStatus;
+    private final AzureVaultXmlSigningService signer;
     private ServiceGinfes servicePort;
 
-    public ConsultaProtocoloJob(RpsRepository rpsRepository, JobStatusHolder jobStatus) {
+    public ConsultaProtocoloJob(RpsRepository rpsRepository, JobStatusHolder jobStatus, AzureVaultXmlSigningService signer) {
         this.rpsRepository = rpsRepository;
         this.jobStatus = jobStatus;
+        this.signer = signer;
         try {
             this.servicePort = new ServiceGinfesImplServiceService().getServiceGinfes();
         } catch (Exception e) {
@@ -74,7 +77,10 @@ public class ConsultaProtocoloJob {
             "</ConsultarSituacaoLoteRpsEnvio>";
 
         try {
-            String resposta = servicePort.consultarSituacaoLoteRpsV3("", xmlConsulta);
+            String certAlias = "CNPJ" + cnpj;
+            String xmlAssinado = signer.signXmlWithAlias(xmlConsulta, certAlias);
+            log.debug("[Job] XML assinado protocolo {}: {}", protocolo, xmlAssinado);
+            String resposta = servicePort.consultarSituacaoLoteRpsV3("", xmlAssinado);
             log.debug("[Job] Resposta SOAP protocolo {}: {}", protocolo, resposta);
             int situacao = extrairSituacao(resposta);
             log.info("[Job] Protocolo {} situacao={}", protocolo, situacao);

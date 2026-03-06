@@ -190,4 +190,42 @@ public class AzureVaultXmlSigningService {
 
         return sw.toString();
     }
+
+    /**
+     * Assina o XML usando um alias específico (sem depender de SecurityContext).
+     */
+    public String signXmlWithAlias(String xml, String alias) throws Exception {
+        log.info("Assinando XML com alias explícito: {}", alias);
+        try { keyStore.load(null, null); } catch (Exception e) { log.debug("KeyStore reload: {}", e.getMessage()); }
+
+        PrivateKey privateKey = (PrivateKey) keyStore.getKey(alias, null);
+        X509Certificate certificate = (X509Certificate) keyStore.getCertificate(alias);
+
+        if (certificate == null) throw new IllegalStateException("Certificado não encontrado para alias: " + alias);
+        if (privateKey == null) throw new IllegalStateException("Chave privada não encontrada para alias: " + alias);
+
+        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+        dbf.setNamespaceAware(true);
+        Document doc = dbf.newDocumentBuilder().parse(new java.io.ByteArrayInputStream(xml.getBytes("UTF-8")));
+
+        XMLSignatureFactory fac = XMLSignatureFactory.getInstance("DOM");
+        Reference ref = fac.newReference("", fac.newDigestMethod(DigestMethod.SHA256, null),
+                Collections.singletonList(fac.newTransform(Transform.ENVELOPED, (TransformParameterSpec) null)), null, null);
+        SignedInfo si = fac.newSignedInfo(
+                fac.newCanonicalizationMethod(CanonicalizationMethod.INCLUSIVE, (C14NMethodParameterSpec) null),
+                fac.newSignatureMethod(SignatureMethod.RSA_SHA256, null), Collections.singletonList(ref));
+        KeyInfoFactory kif = fac.getKeyInfoFactory();
+        X509Data x509Data = kif.newX509Data(Collections.singletonList(certificate));
+        KeyInfo ki = kif.newKeyInfo(Collections.singletonList(x509Data));
+
+        DOMSignContext ctx = new DOMSignContext(privateKey, doc.getDocumentElement());
+        fac.newXMLSignature(si, ki).sign(ctx);
+
+        Transformer transformer = TransformerFactory.newInstance().newTransformer();
+        transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "no");
+        StringWriter sw = new StringWriter();
+        transformer.transform(new DOMSource(doc), new StreamResult(sw));
+        return sw.toString();
+    }
+
 }
