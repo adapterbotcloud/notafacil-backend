@@ -68,6 +68,10 @@ public class ConsultaProtocoloJob {
         String cnpj = sample.getEmpresa().getCnpj();
         String im = sample.getEmpresa().getInscricaoMunicipal();
 
+        String cabecalho = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
+            "<ns2:cabecalho versao=\"3\" xmlns:ns2=\"http://www.ginfes.com.br/cabecalho_v03.xsd\">" +
+            "<versaoDados>3</versaoDados></ns2:cabecalho>";
+
         String xmlConsulta =
             "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
             "<ConsultarSituacaoLoteRpsEnvio xmlns=\"http://www.ginfes.com.br/servico_consultar_situacao_lote_rps_envio_v03.xsd\">" +
@@ -80,7 +84,7 @@ public class ConsultaProtocoloJob {
             String certAlias = "CNPJ" + cnpj;
             String xmlAssinado = signer.signXmlWithAlias(xmlConsulta, certAlias);
             log.debug("[Job] XML assinado protocolo {}: {}", protocolo, xmlAssinado);
-            String resposta = servicePort.consultarSituacaoLoteRpsV3("", xmlAssinado);
+            String resposta = servicePort.consultarSituacaoLoteRpsV3(cabecalho, xmlAssinado);
             log.debug("[Job] Resposta SOAP protocolo {}: {}", protocolo, resposta);
             int situacao = extrairSituacao(resposta);
             log.info("[Job] Protocolo {} situacao={}", protocolo, situacao);
