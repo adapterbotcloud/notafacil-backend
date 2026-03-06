@@ -22,7 +22,8 @@ public class RpsEntity {
         public static final int PENDENTE = 0; // persistido e aguardando envio
         public static final int ENVIANDO = 1; // em processamento assíncrono
         public static final int ENVIADO  = 2; // lote enviado com sucesso
-        public static final int FALHA    = 3; // falha no cálculo/mapeamento/envio
+        public static final int FALHA    = 3; // falha no envio ou processamento
+        public static final int PROCESSADO = 4; // processado com sucesso pela SEFIN // falha no cálculo/mapeamento/envio
         private Status() {}
     }
 

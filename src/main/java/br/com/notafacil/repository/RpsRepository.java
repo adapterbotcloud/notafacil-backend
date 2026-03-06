@@ -25,4 +25,12 @@ public interface RpsRepository extends JpaRepository<RpsEntity, Long> {
 
     @Query("SELECT r.anoCobranca, r.mesCobranca, COUNT(r) FROM RpsEntity r WHERE r.empresa.id = :empresaId AND r.anoCobranca IS NOT NULL GROUP BY r.anoCobranca, r.mesCobranca ORDER BY r.anoCobranca DESC, r.mesCobranca DESC")
     List<Object[]> findDistinctAnoMesByEmpresaId(@Param("empresaId") Long empresaId);
+
+    @Query("SELECT DISTINCT r.protocolo FROM RpsEntity r WHERE r.protocolo IS NOT NULL AND r.status = 2")
+    List<String> findPendingProtocols();
+
+    @org.springframework.data.jpa.repository.Modifying
+    @Query("UPDATE RpsEntity r SET r.status = :status, r.mensagemErro = :msg WHERE r.protocolo = :protocolo")
+    void updateStatusByProtocolo(@Param("protocolo") String protocolo, @Param("status") int status, @Param("msg") String msg);
+
 }
