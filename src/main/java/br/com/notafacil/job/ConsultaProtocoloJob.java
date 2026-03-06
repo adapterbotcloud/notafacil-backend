@@ -52,6 +52,10 @@ public class ConsultaProtocoloJob {
                 log.warn("[Job] Falha protocolo {}: {}", protocolo, e.getMessage());
             }
         }
+
+        // Atualizar contagem após processar
+        List<String> restantes = rpsRepository.findPendingProtocols();
+        jobStatus.setProtocolosPendentes(restantes.size());
     }
 
     private void consultarSituacao(String protocolo) {
