@@ -30,7 +30,7 @@ public class EmpresaController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    @PreAuthorize("hasAnyRole('ADMIN','GESTOR')")
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping
     public ResponseEntity<?> criar(@RequestBody EmpresaEntity empresa) {
         if (empresaRepository.findByCnpj(empresa.getCnpj()).isPresent()) {
@@ -40,7 +40,7 @@ public class EmpresaController {
         return ResponseEntity.ok(salva);
     }
 
-    @PreAuthorize("hasAnyRole('ADMIN','GESTOR')")
+    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/{id}")
     public ResponseEntity<?> atualizar(@PathVariable Long id, @RequestBody EmpresaEntity empresa) {
         return empresaRepository.findById(id).map(existing -> {
