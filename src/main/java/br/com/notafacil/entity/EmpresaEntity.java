@@ -79,4 +79,36 @@ public class EmpresaEntity {
     @Column(name = "aliquota", nullable = false, precision = 10, scale = 6)
     private BigDecimal aliquota;
 
+    @Getter @Setter
+    @Column(name = "razao_social", length = 200)
+    private String razaoSocial;
+
+    @Getter @Setter
+    @Column(name = "endereco", length = 200)
+    private String endereco;
+
+    @Getter @Setter
+    @Column(name = "numero", length = 20)
+    private String numero;
+
+    @Getter @Setter
+    @Column(name = "complemento", length = 100)
+    private String complemento;
+
+    @Getter @Setter
+    @Column(name = "bairro", length = 100)
+    private String bairro;
+
+    @Getter @Setter
+    @Column(name = "cep", length = 10)
+    private String cep;
+
+    @Getter @Setter
+    @Column(name = "telefone", length = 20)
+    private String telefone;
+
+    @Getter @Setter
+    @Column(name = "substituto_tributario")
+    private Boolean substitutoTributario = false;
+
 }

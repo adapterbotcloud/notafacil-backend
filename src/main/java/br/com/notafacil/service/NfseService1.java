@@ -251,6 +251,9 @@ public class NfseService1 {
                         mapper.toSchema(envio)   // DTO -> objeto JAXB
                 );
 
+                // Limpar namespaces desnecessários
+                xmlNaoAssinado = br.com.notafacil.util.XmlNamespaceCleaner.limpar(xmlNaoAssinado);
+
                 final String xmlAssinado = signer.signXml(xmlNaoAssinado);
                 log.info("XML NÃO ASSINADO:\n{}", xmlNaoAssinado);
                 log.info("XML ASSINADO:\n{}", xmlAssinado);
@@ -420,6 +423,11 @@ public class NfseService1 {
         }
         rpsRepository.saveAll(list);
     }
+
+    /**
+     * Remove namespaces desnecessários e normaliza o XML para o padrão SEFIN/Ginfes.
+     * O XML deve ter apenas os namespaces do envio e tipos.
+     */
 
     /* =========================================================
        UTILITÁRIOS

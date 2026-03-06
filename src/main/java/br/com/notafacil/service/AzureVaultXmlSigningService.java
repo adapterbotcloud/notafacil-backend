@@ -29,6 +29,8 @@ import java.util.Collections;
 @Service
 public class AzureVaultXmlSigningService {
 
+    private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(AzureVaultXmlSigningService.class);
+
     private final KeyStore keyStore;
     private final CertificateAliasStrategy aliasStrategy;
 
@@ -42,8 +44,28 @@ public class AzureVaultXmlSigningService {
      */
     public String signXml(String xml) throws Exception {
         String alias = aliasStrategy.resolveAlias();
+        log.info("Assinando XML com alias: {}", alias);
+
+        // Forçar refresh do KeyStore Azure JCA
+        try { keyStore.load(null, null); } catch (Exception e) { log.debug("KeyStore reload: {}", e.getMessage()); }
+
+        // Listar aliases disponíveis
+        try {
+            java.util.Enumeration<String> aliases = keyStore.aliases();
+            java.util.List<String> aliasList = new java.util.ArrayList<>();
+            while (aliases.hasMoreElements()) aliasList.add(aliases.nextElement());
+            log.info("Aliases disponíveis no KeyStore: {}", aliasList);
+        } catch (Exception e) { log.warn("Erro ao listar aliases: {}", e.getMessage()); }
+
         PrivateKey privateKey = (PrivateKey) keyStore.getKey(alias, null);
         X509Certificate certificate = (X509Certificate) keyStore.getCertificate(alias);
+
+        if (certificate == null) {
+            throw new IllegalStateException("Certificado não encontrado no KeyStore para alias: " + alias);
+        }
+        if (privateKey == null) {
+            throw new IllegalStateException("Chave privada não encontrada no KeyStore para alias: " + alias);
+        }
 
         // 1) Parse do XML
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
@@ -100,10 +122,20 @@ public class AzureVaultXmlSigningService {
     /**
      * Assina o XML de entrada (enveloped) e retorna o XML com <Signature> inserido.
      */
-    public String signXml(String xml,String idToSign) throws Exception {
+    public String signXml(String xml, String idToSign) throws Exception {
         String alias = aliasStrategy.resolveAlias();
+        log.info("Assinando XML (idToSign={}) com alias: {}", idToSign, alias);
+        try { keyStore.load(null, null); } catch (Exception e) { log.debug("KeyStore reload: {}", e.getMessage()); }
+
         PrivateKey privateKey = (PrivateKey) keyStore.getKey(alias, null);
         X509Certificate certificate = (X509Certificate) keyStore.getCertificate(alias);
+
+        if (certificate == null) {
+            throw new IllegalStateException("Certificado não encontrado no KeyStore para alias: " + alias);
+        }
+        if (privateKey == null) {
+            throw new IllegalStateException("Chave privada não encontrada no KeyStore para alias: " + alias);
+        }
         // 1) Parse do XML
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         dbf.setNamespaceAware(true);

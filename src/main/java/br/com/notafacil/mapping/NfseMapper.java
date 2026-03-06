@@ -6,6 +6,10 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
 import java.util.List;
+import java.time.LocalDateTime;
+import javax.xml.datatype.DatatypeFactory;
+import javax.xml.datatype.XMLGregorianCalendar;
+import javax.xml.datatype.DatatypeConstants;
 
 @Mapper(componentModel = "spring")
 public interface NfseMapper {
@@ -76,5 +80,20 @@ public interface NfseMapper {
     }
     private static boolean isNotBlank(String s) {
         return s != null && !s.trim().isEmpty();
+    }
+
+    default XMLGregorianCalendar localDateTimeToXmlGregorianCalendar(LocalDateTime dt) {
+        if (dt == null) return null;
+        try {
+            XMLGregorianCalendar cal = DatatypeFactory.newInstance().newXMLGregorianCalendar(
+                dt.getYear(), dt.getMonthValue(), dt.getDayOfMonth(),
+                dt.getHour(), dt.getMinute(), dt.getSecond(),
+                DatatypeConstants.FIELD_UNDEFINED, // sem milissegundos
+                DatatypeConstants.FIELD_UNDEFINED   // sem timezone
+            );
+            return cal;
+        } catch (Exception e) {
+            throw new RuntimeException("Erro ao converter LocalDateTime", e);
+        }
     }
 }
