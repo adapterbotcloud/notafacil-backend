@@ -18,10 +18,12 @@ public class ConsultaProtocoloJob {
     private static final Logger log = LoggerFactory.getLogger(ConsultaProtocoloJob.class);
 
     private final RpsRepository rpsRepository;
+    private final JobStatusHolder jobStatus;
     private ServiceGinfes servicePort;
 
-    public ConsultaProtocoloJob(RpsRepository rpsRepository) {
+    public ConsultaProtocoloJob(RpsRepository rpsRepository, JobStatusHolder jobStatus) {
         this.rpsRepository = rpsRepository;
+        this.jobStatus = jobStatus;
         try {
             this.servicePort = new ServiceGinfesImplServiceService().getServiceGinfes();
         } catch (Exception e) {
@@ -34,6 +36,8 @@ public class ConsultaProtocoloJob {
     @Transactional
     public void consultarProtocolosPendentes() {
         List<String> pendentes = rpsRepository.findPendingProtocols();
+        jobStatus.setUltimaExecucao(java.time.LocalDateTime.now());
+        jobStatus.setProtocolosPendentes(pendentes.size());
         if (pendentes.isEmpty()) return;
 
         log.info("[Job] {} protocolo(s) pendente(s)", pendentes.size());

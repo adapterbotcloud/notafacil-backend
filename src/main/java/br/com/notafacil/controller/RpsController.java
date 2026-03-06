@@ -1,6 +1,7 @@
 package br.com.notafacil.controller;
 
 import br.com.notafacil.entity.RpsEntity;
+import br.com.notafacil.job.JobStatusHolder;
 import br.com.notafacil.repository.EmpresaRepository;
 import br.com.notafacil.repository.RpsRepository;
 import br.com.notafacil.repository.UsuarioRepository;
@@ -20,11 +21,13 @@ public class RpsController {
     private final RpsRepository rpsRepo;
     private final EmpresaRepository empresaRepo;
     private final UsuarioRepository usuarioRepo;
+    private final JobStatusHolder jobStatus;
 
-    public RpsController(RpsRepository rpsRepo, EmpresaRepository empresaRepo, UsuarioRepository usuarioRepo) {
+    public RpsController(RpsRepository rpsRepo, EmpresaRepository empresaRepo, UsuarioRepository usuarioRepo, JobStatusHolder jobStatus) {
         this.rpsRepo = rpsRepo;
         this.empresaRepo = empresaRepo;
         this.usuarioRepo = usuarioRepo;
+        this.jobStatus = jobStatus;
     }
 
     @GetMapping
@@ -68,6 +71,14 @@ public class RpsController {
         )).collect(Collectors.toList());
 
         return ResponseEntity.ok(result);
+    }
+
+    @GetMapping("/job-status")
+    public ResponseEntity<?> jobStatus() {
+        Map<String, Object> map = new LinkedHashMap<>();
+        map.put("ultimaExecucao", jobStatus.getUltimaExecucao() != null ? jobStatus.getUltimaExecucao().toString() : null);
+        map.put("protocolosPendentes", jobStatus.getProtocolosPendentes());
+        return ResponseEntity.ok(map);
     }
 
     private Map<String, Object> toMap(RpsEntity r) {
