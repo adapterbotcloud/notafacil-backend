@@ -16,6 +16,10 @@ spring:
     show-sql: true
     properties:
       hibernate.format_sql: true
+  webservices:
+    servlet:
+      load-on-startup: -1
+    path: /ws
   jvm:
     system-properties:
       azure.keyvault.jca.certificates-refresh-interval-in-ms: 3600000
@@ -58,3 +62,11 @@ azure:
     id: ${AZURE_TENANT_ID:}
 
 
+
+springdoc:
+  api-docs:
+    enabled: true
+    path: /v3/api-docs
+  swagger-ui:
+    enabled: true
+    path: /swagger-ui.html
