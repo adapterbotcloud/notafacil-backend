@@ -75,6 +75,7 @@ public class ConsultaProtocoloJob {
 
         try {
             String resposta = servicePort.consultarSituacaoLoteRpsV3("", xmlConsulta);
+            log.debug("[Job] Resposta SOAP protocolo {}: {}", protocolo, resposta);
             int situacao = extrairSituacao(resposta);
             log.info("[Job] Protocolo {} situacao={}", protocolo, situacao);
 
@@ -89,7 +90,15 @@ public class ConsultaProtocoloJob {
                     log.info("[Job] Protocolo {} SUCESSO", protocolo);
                     rpsRepository.updateStatusByProtocolo(protocolo, 4, null);
                 }
-                default -> log.warn("[Job] Protocolo {} situacao desconhecida: {}", protocolo, situacao);
+                default -> {
+                    String erroMsg = extrairTag(resposta, "Mensagem", null);
+                    if (erroMsg != null) {
+                        log.warn("[Job] Protocolo {} rejeitado: {}", protocolo, erroMsg);
+                        rpsRepository.updateStatusByProtocolo(protocolo, 3, erroMsg);
+                    } else {
+                        log.warn("[Job] Protocolo {} situacao desconhecida: {}", protocolo, situacao);
+                    }
+                }
             }
         } catch (Exception e) {
             log.error("[Job] Erro SOAP protocolo {}: {}", protocolo, e.getMessage());
@@ -105,9 +114,15 @@ public class ConsultaProtocoloJob {
     }
 
     private String extrairTag(String xml, String tag, String fallback) {
+        // Try without namespace
         int s = xml.indexOf("<" + tag + ">");
         int e = xml.indexOf("</" + tag + ">");
         if (s >= 0 && e > s) return xml.substring(s + tag.length() + 2, e).trim();
+        // Try with namespace prefix (e.g. <ns2:Situacao>)
+        java.util.regex.Matcher m = java.util.regex.Pattern
+            .compile("<[^:>]+:" + tag + ">([^<]+)</[^:>]+:" + tag + ">")
+            .matcher(xml);
+        if (m.find()) return m.group(1).trim();
         return fallback;
     }
 }
