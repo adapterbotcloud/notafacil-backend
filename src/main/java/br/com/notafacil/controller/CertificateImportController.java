@@ -9,7 +9,6 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.security.access.prepost.PreAuthorize;
 
 @RestController
-@PreAuthorize("hasAnyRole('ADMIN','GESTOR')")
 @RequestMapping("/certificates")
 public class CertificateImportController {
 
@@ -36,6 +35,7 @@ public class CertificateImportController {
         }
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN','GESTOR')")
     @PostMapping("/import")
     public ResponseEntity<String> importCertificate(
             @RequestParam("file") MultipartFile file,
