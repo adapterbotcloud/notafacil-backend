@@ -26,6 +26,20 @@ Sistema de emissão de **NFS-e** (Nota Fiscal de Serviço Eletrônica) para a pr
 CREATE DATABASE rpsdb;
 ```
 
+### Variáveis de Ambiente (Azure)
+
+Criar arquivo `.env` na raiz do projeto (não versionado):
+
+```bash
+AZURE_KEYVAULT_URL=https://notafacil.vault.azure.net/
+AZURE_KEYVAULT_CERT_ALIAS=cert-name
+AZURE_CLIENT_ID=<seu-client-id>
+AZURE_CLIENT_SECRET=<seu-client-secret>
+AZURE_TENANT_ID=<seu-tenant-id>
+```
+
+> ⚠️ O arquivo `.env` tem permissão `600` e está no `.gitignore`.
+
 ### application.yml
 
 ```yaml
@@ -269,7 +283,13 @@ notafacil-api.adapterbot.cloud {
 
 ## 📌 Versão
 
-**v1.1.0** — Perfil GESTOR, listagem de RPS com filtro por competência, geração de PDF.
+**v1.2.0** — Deduplicação de RPS, credenciais via variáveis de ambiente, Azure fallback gracioso.
+
+### Changelog
+
+- **v1.2.0** — Deduplicação por idCobranca no backend, credenciais Azure via `.env`, KeyVault fallback gracioso
+- **v1.1.0** — Perfil GESTOR, listagem de RPS com filtro por competência, geração de PDF
+- **v1.0.0** — MVP com autenticação JWT, emissão de RPS e deduplicação por idCobranca
 
 ## 📄 Licença
 
