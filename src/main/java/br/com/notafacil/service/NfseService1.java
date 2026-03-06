@@ -66,12 +66,18 @@ public class NfseService1 {
 
         final EmpresaEntity empresa = empresaService.getByCnpjOrThrow(empresaCnpj);
 
-        // 1) Persiste RPS como PENDENTE
-        final List<Long> rpsIds = persistirRpsMinimos(empresa, listaMin);
+        // 1) Persiste RPS como PENDENTE e retorna entidades salvas
+        final List<RpsEntity> entidades = persistirRpsMinimosEntidades(empresa, listaMin);
+        final List<Long> rpsIds = entidades.stream().map(RpsEntity::getId).collect(java.util.stream.Collectors.toList());
+        log.info("[emitirSincrono] {} RPS persistidos", rpsIds.size());
+
+        if (entidades.isEmpty()) {
+            return new EmitirRpsResponse(List.of(), List.of());
+        }
 
         // 2) Converte/Enriquece e envia em lotes (assina + SOAP)
-        final List<RpsEntity> entidades = rpsRepository.findAllById(rpsIds);
         final List<InfRpsRequestDto> completos = toInfRpsList(entidades);
+        log.info("[emitirSincrono] {} InfRps montados para envio", completos.size());
         try {
             final List<String> protocolos = emitirRpsEmLotes(cabecalho, completos);
             // 3) Atualiza status/protocolo
@@ -88,6 +94,58 @@ public class NfseService1 {
        PERSISTÊNCIA
        ========================================================= */
     @Transactional
+    public List<RpsEntity> persistirRpsMinimosEntidades(final EmpresaEntity empresa, final List<RpsMinRequestDto> listaMin) {
+        final List<Long> idsCobranca = listaMin.stream()
+                .map(RpsMinRequestDto::idCobranca)
+                .filter(id -> id != null && id > 0)
+                .distinct()
+                .collect(java.util.stream.Collectors.toList());
+
+        final java.util.Set<Long> jaExistem = idsCobranca.isEmpty()
+                ? java.util.Collections.emptySet()
+                : new java.util.HashSet<>(rpsRepository.findIdCobrancasByEmpresaAndIds(empresa.getId(), idsCobranca));
+
+        final List<RpsMinRequestDto> novos = listaMin.stream()
+                .filter(min -> min.idCobranca() == null || !jaExistem.contains(min.idCobranca()))
+                .collect(java.util.stream.Collectors.toList());
+
+        if (novos.isEmpty()) {
+            return java.util.Collections.emptyList();
+        }
+
+        final int n = novos.size();
+        final List<RpsEntity> salvos = new ArrayList<>(n);
+
+        for (int i = 0; i < n; i++) {
+            final RpsMinRequestDto min = novos.get(i);
+
+            final RpsEntity rps = new RpsEntity();
+            rps.setEmpresa(empresa);
+            rps.setRequestId(min.id());
+            rps.setNumero(gerarNumeroRps());
+            rps.setSerie("A");
+            rps.setTipo(1);
+            rps.setDataEmissao(LocalDateTime.now().minusMinutes(1));
+            rps.setNaturezaOperacao(1);
+            rps.setRegimeEspecialTributacao(empresa.getRegimeEspecialTributacao());
+            rps.setOptanteSimplesNacional(empresa.getOptanteSimplesNacional());
+            rps.setIncentivadorCultural(empresa.getIncentivadorCultural());
+            rps.setValorServicos(min.servico().valorServicos());
+            rps.setDiscriminacao(min.servico().discriminacao());
+            rps.setTomadorCpf(min.tomador().cpf());
+            rps.setTomadorRazaoSocial(min.tomador().razaoSocial());
+            rps.setIdCobranca(min.idCobranca());
+            rps.setMesCobranca(min.mesCobranca());
+            rps.setAnoCobranca(min.anoCobranca());
+            rps.setStatus(RpsEntity.Status.PENDENTE);
+
+            salvos.add(rps);
+        }
+
+        return rpsRepository.saveAll(salvos);
+    }
+
+        @Transactional
     public List<Long> persistirRpsMinimos(final EmpresaEntity empresa, final List<RpsMinRequestDto> listaMin) {
         // Deduplicação: filtrar idCobrancas que já existem no banco
         final List<Long> idsCobranca = listaMin.stream()
