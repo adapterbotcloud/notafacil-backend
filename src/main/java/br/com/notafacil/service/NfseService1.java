@@ -118,7 +118,7 @@ public class NfseService1 {
             rps.setNumero(gerarNumeroRps());
             rps.setSerie("A");
             rps.setTipo(1);
-            rps.setDataEmissao(LocalDateTime.now());
+            rps.setDataEmissao(LocalDateTime.now().minusMinutes(1));
 
             rps.setNaturezaOperacao(1);
             rps.setRegimeEspecialTributacao(empresa.getRegimeEspecialTributacao());
