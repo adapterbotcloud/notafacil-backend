@@ -16,7 +16,7 @@ public class JaxbXmlService {
 
     public JaxbXmlService() {
         try {
-            this.ctx = JAXBContext.newInstance("br.com.notafacil.schemas");
+            this.ctx = JAXBContext.newInstance("br.com.notafacil.schemas:br.com.notafacil.schemas.v4");
         } catch (JAXBException e) {
             throw new IllegalStateException("Falha ao inicializar JAXBContext", e);
         }
