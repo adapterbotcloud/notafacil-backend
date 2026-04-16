@@ -15,6 +15,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.regex.Matcher;
@@ -51,9 +53,13 @@ public class NfseService1 {
         this.mapper         = Objects.requireNonNull(mapper);
         this.signer         = Objects.requireNonNull(signer);
         this.jaxbXmlService = jaxbXmlService;
-        this.servicePort = new ServiceGinfesImplServiceService(
-            ClassLoader.getSystemResource("wsdl/ServiceGinfesImplService.wsdl")
-        ).getServiceGinfes();
+        // Usa HTTPS pro WSDL em produção (não precisa de arquivo local no classpath)
+        try {
+            URL wsdlUrl = new URL("https://isshomo.sefin.fortaleza.ce.gov.br/grpfor-iss/ServiceGinfesImplService?wsdl");
+            this.servicePort = new ServiceGinfesImplServiceService(wsdlUrl).getServiceGinfes();
+        } catch (MalformedURLException e) {
+            throw new IllegalStateException("URL do WSDL NFSe inválida", e);
+        }
     }
 
     /* =========================================================
