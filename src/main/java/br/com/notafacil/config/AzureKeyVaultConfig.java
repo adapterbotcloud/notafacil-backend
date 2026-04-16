@@ -1,8 +1,5 @@
 package br.com.notafacil.config;
 
-import com.azure.identity.ClientSecretCredential;
-import com.azure.security.keyvault.certificates.CertificateClient;
-import com.azure.security.keyvault.certificates.CertificateClientBuilder;
 import com.azure.security.keyvault.jca.KeyVaultJcaProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -60,49 +57,6 @@ public class AzureKeyVaultConfig {
             } catch (Exception ex) {
                 throw new RuntimeException("Falha ao criar KeyStore fallback", ex);
             }
-        }
-    }
-
-    @Bean
-    public ClientSecretCredential clientSecretCredential() {
-        return new ClientSecretCredentialBuilder()
-                .tenantId(tenantId)
-                .clientId(clientId)
-                .clientSecret(clientSecret)
-                .build();
-    }
-
-    @Bean
-    public CertificateClient certificateClient(ClientSecretCredential credential) {
-        return new CertificateClientBuilder()
-                .vaultUrl(vaultUrl)
-                .credential(credential)
-                .buildClient();
-    }
-
-    // Inner builder class for ClientSecretCredential
-    private static class ClientSecretCredentialBuilder {
-        private String tenantId;
-        private String clientId;
-        private String clientSecret;
-
-        public ClientSecretCredentialBuilder tenantId(String tenantId) {
-            this.tenantId = tenantId;
-            return this;
-        }
-
-        public ClientSecretCredentialBuilder clientId(String clientId) {
-            this.clientId = clientId;
-            return this;
-        }
-
-        public ClientSecretCredentialBuilder clientSecret(String clientSecret) {
-            this.clientSecret = clientSecret;
-            return this;
-        }
-
-        public ClientSecretCredential build() {
-            return new ClientSecretCredential(tenantId, clientId, clientSecret);
         }
     }
 }
