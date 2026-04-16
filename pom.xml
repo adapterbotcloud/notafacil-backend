@@ -176,9 +176,7 @@
                         <phase>generate-sources</phase>
                         <goals><goal>wsimport</goal></goals>
                         <configuration>
-                            <wsdlUrls>
-                                <wsdlUrl>http://isshomo.sefin.fortaleza.ce.gov.br/grpfor-iss/ServiceGinfesImplService?wsdl</wsdlUrl>
-                            </wsdlUrls>
+                            <wsdlDirectory>${project.basedir}/src/main/resources/wsdl</wsdlDirectory>
                             <sourceDestDir>${project.build.directory}/generated-sources/jaxws</sourceDestDir>
                             <packageName>br.com.notafacil.wsdl</packageName>
                             <keep>true</keep>
