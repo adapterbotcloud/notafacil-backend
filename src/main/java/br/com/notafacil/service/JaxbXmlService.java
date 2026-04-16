@@ -7,16 +7,24 @@ import java.io.StringWriter;
 
 import org.springframework.stereotype.Component;
 
-/** Marshal/Unmarshal de objetos JAXB gerados do pacote br.com.notafacil.schemas */
+import br.com.notafacil.schemas.v4.TcDadosIbsCbs;
+import br.com.notafacil.schemas.v4.TcDadosServicoV4;
+import br.com.notafacil.schemas.v4.TcValoresIbsCbs;
+
+/** Marshal/Unmarshal de objetos JAXB gerados do pacote br.com.notafacil.schemas.v4 */
 @Component
 public class JaxbXmlService {
 
-    // Contexto para TODO o pacote de schemas (rápido e cacheado)
+    // Contexto criado com referências diretas às classes — não depende de package scanning
     private final JAXBContext ctx;
 
     public JaxbXmlService() {
         try {
-            this.ctx = JAXBContext.newInstance("br.com.notafacil.schemas.v4");
+            this.ctx = JAXBContext.newInstance(
+                TcDadosIbsCbs.class,
+                TcDadosServicoV4.class,
+                TcValoresIbsCbs.class
+            );
         } catch (JAXBException e) {
             throw new IllegalStateException("Falha ao inicializar JAXBContext", e);
         }
