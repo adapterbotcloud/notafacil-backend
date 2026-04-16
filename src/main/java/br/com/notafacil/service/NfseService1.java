@@ -51,7 +51,9 @@ public class NfseService1 {
         this.mapper         = Objects.requireNonNull(mapper);
         this.signer         = Objects.requireNonNull(signer);
         this.jaxbXmlService = jaxbXmlService;
-        this.servicePort    = new ServiceGinfesImplServiceService().getServiceGinfes();
+        this.servicePort = new ServiceGinfesImplServiceService(
+            ClassLoader.getSystemResource("wsdl/ServiceGinfesImplService.wsdl")
+        ).getServiceGinfes();
     }
 
     /* =========================================================
