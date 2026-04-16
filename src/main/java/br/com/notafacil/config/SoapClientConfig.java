@@ -1,13 +1,13 @@
 package br.com.notafacil.config;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.oxm.jaxb.Jaxb2Marshaller;
-import org.springframework.ws.client.core.WebServiceTemplate;
-import org.springframework.ws.transport.http.HttpUrlConnectionMessageSender;
 
-import java.time.Duration;
+import br.com.notafacil.schemas.v4.TcDadosIbsCbs;
+import br.com.notafacil.schemas.v4.TcDadosServicoV4;
+import br.com.notafacil.schemas.v4.TcValoresIbsCbs;
+
 
 @Configuration
 public class SoapClientConfig {
@@ -15,21 +15,12 @@ public class SoapClientConfig {
     @Bean
     public Jaxb2Marshaller marshaller() {
         Jaxb2Marshaller marshaller = new Jaxb2Marshaller();
-        marshaller.setContextPath("br.com.notafacil.schemas.v4");
+        // Usa refs diretas às classes em vez de package scanning (evita procurar ObjectFactory/jaxb.index)
+        marshaller.setClassesToBeBound(
+            TcDadosIbsCbs.class,
+            TcDadosServicoV4.class,
+            TcValoresIbsCbs.class
+        );
         return marshaller;
-    }
-
-    @Bean
-    public WebServiceTemplate webServiceTemplate(Jaxb2Marshaller marshaller,
-                                                 @Value("${nfse.service.url}") String uri) {
-        WebServiceTemplate template = new WebServiceTemplate();
-        template.setMarshaller(marshaller);
-        template.setUnmarshaller(marshaller);
-        template.setDefaultUri(uri);
-        var sender = new HttpUrlConnectionMessageSender();
-        sender.setConnectionTimeout(Duration.ofSeconds(5000));
-        sender.setReadTimeout(Duration.ofSeconds(15000));
-        template.setMessageSender(sender);
-        return template;
     }
 }
