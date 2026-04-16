@@ -15,7 +15,7 @@ public class SoapClientConfig {
     @Bean
     public Jaxb2Marshaller marshaller() {
         Jaxb2Marshaller marshaller = new Jaxb2Marshaller();
-        marshaller.setPackagesToScan("br.com.notafacil.schemas");
+        marshaller.setContextPath("br.com.notafacil.schemas.v4");
         return marshaller;
     }
 
