@@ -36,7 +36,7 @@ public class AzureKeyVaultConfig {
 
     @Bean
     public ClientSecretCredential azureCredential() {
-        return new ClientSecretCredential(tenantId, clientId, clientSecret);
+        return new ClientSecretCredential(tenantId, clientId, clientSecret, null);
     }
 
     @Bean
