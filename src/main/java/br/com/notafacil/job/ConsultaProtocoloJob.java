@@ -11,6 +11,8 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.List;
 
 @Component
@@ -23,12 +25,21 @@ public class ConsultaProtocoloJob {
     private final AzureVaultXmlSigningService signer;
     private ServiceGinfes servicePort;
 
+    private static final URL WSDL_URL;
+    static {
+        try {
+            WSDL_URL = new URL("https://isshomo.sefin.fortaleza.ce.gov.br/grpfor-iss/ServiceGinfesImplService?wsdl");
+        } catch (MalformedURLException e) {
+            throw new IllegalStateException("URL do WSDL NFSe inválida", e);
+        }
+    }
+
     public ConsultaProtocoloJob(RpsRepository rpsRepository, JobStatusHolder jobStatus, AzureVaultXmlSigningService signer) {
         this.rpsRepository = rpsRepository;
         this.jobStatus = jobStatus;
         this.signer = signer;
         try {
-            this.servicePort = new ServiceGinfesImplServiceService().getServiceGinfes();
+            this.servicePort = new ServiceGinfesImplServiceService(WSDL_URL).getServiceGinfes();
         } catch (Exception e) {
             log.warn("[Job] SOAP port indisponivel: {}", e.getMessage());
             this.servicePort = null;

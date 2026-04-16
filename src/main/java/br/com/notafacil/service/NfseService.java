@@ -14,6 +14,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.io.StringReader;
 import java.io.StringWriter;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -35,14 +37,21 @@ public class NfseService {
 
     private static final int MAX_RPS_PER_LOTE = 50;
 
+    private static final URL WSDL_URL;
+    static {
+        try {
+            WSDL_URL = new URL("https://isshomo.sefin.fortaleza.ce.gov.br/grpfor-iss/ServiceGinfesImplService?wsdl");
+        } catch (MalformedURLException e) {
+            throw new IllegalStateException("URL do WSDL NFSe inválida", e);
+        }
+    }
+
     public NfseService(NfseMapper mapper, AzureVaultXmlSigningService xmlSigner) throws Exception {
         this.mapper = mapper;
         this.xmlSigner = xmlSigner;
 
         // 1) Cria o stub do serviço
-        ServiceGinfesImplServiceService svc = new ServiceGinfesImplServiceService();
-        svc.getServiceGinfes();
-        this.port = svc.getServiceGinfes();
+        this.port = new ServiceGinfesImplServiceService(WSDL_URL).getServiceGinfes();
 
         // 2) Prepara o JAXBContext com os schemas das classes geradas
         this.jaxbCtx = JAXBContext.newInstance(

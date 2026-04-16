@@ -14,6 +14,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -38,10 +40,19 @@ public class NfseServiceV4 {
     @Value("${nfse.lote.tamanho:50}")
     private int tamanhoBatch;
 
+    private static final URL WSDL_URL;
+    static {
+        try {
+            WSDL_URL = new URL("https://isshomo.sefin.fortaleza.ce.gov.br/grpfor-iss/ServiceGinfesImplService?wsdl");
+        } catch (MalformedURLException e) {
+            throw new IllegalStateException("URL do WSDL NFSe inválida", e);
+        }
+    }
+
     public NfseServiceV4(JaxbXmlService jaxbXmlService, AzureVaultXmlSigningService signer) {
         this.jaxbXmlService = jaxbXmlService;
         this.signer = signer;
-        this.servicePort = new ServiceGinfesImplServiceService().getServiceGinfes();
+        this.servicePort = new ServiceGinfesImplServiceService(WSDL_URL).getServiceGinfes();
     }
 
     /**
