@@ -1,5 +1,8 @@
 package br.com.notafacil.config;
 
+import com.azure.identity.ClientSecretCredential;
+import com.azure.security.keyvault.certificates.CertificateClient;
+import com.azure.security.keyvault.certificates.CertificateClientBuilder;
 import com.azure.security.keyvault.jca.KeyVaultJcaProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,6 +33,19 @@ public class AzureKeyVaultConfig {
     @Value("${azure.tenant.id}")
     private String tenantId;
 
+
+    @Bean
+    public ClientSecretCredential azureCredential() {
+        return new ClientSecretCredential(tenantId, clientId, clientSecret);
+    }
+
+    @Bean
+    public CertificateClient certificateClient(ClientSecretCredential azureCredential) {
+        return new CertificateClientBuilder()
+                .vaultUrl(vaultUrl)
+                .credential(azureCredential)
+                .buildClient();
+    }
 
     @Bean
     public KeyVaultJcaProvider keyVaultProvider() {

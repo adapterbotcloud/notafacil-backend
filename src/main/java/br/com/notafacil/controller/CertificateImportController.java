@@ -6,10 +6,12 @@ import com.azure.security.keyvault.certificates.models.ImportCertificateOptions;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.security.access.prepost.PreAuthorize;
 
 @RestController
 @RequestMapping("/certificates")
+@ConditionalOnProperty(name = "azure.keyvault.url", matchIfMissing = false)
 public class CertificateImportController {
 
     private final CertificateClient certificateClient;
