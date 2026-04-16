@@ -7,6 +7,7 @@ import com.azure.security.keyvault.jca.KeyVaultJcaProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -15,6 +16,7 @@ import java.security.Security;
 
 
 @Configuration
+@ConditionalOnProperty(name = "azure.keyvault.url", matchIfMissing = false)
 public class AzureKeyVaultConfig {
 
     private static final Logger log = LoggerFactory.getLogger(AzureKeyVaultConfig.class);
@@ -62,10 +64,45 @@ public class AzureKeyVaultConfig {
     }
 
     @Bean
+    public ClientSecretCredential clientSecretCredential() {
+        return new ClientSecretCredentialBuilder()
+                .tenantId(tenantId)
+                .clientId(clientId)
+                .clientSecret(clientSecret)
+                .build();
+    }
+
+    @Bean
     public CertificateClient certificateClient(ClientSecretCredential credential) {
         return new CertificateClientBuilder()
                 .vaultUrl(vaultUrl)
                 .credential(credential)
                 .buildClient();
+    }
+
+    // Inner builder class for ClientSecretCredential
+    private static class ClientSecretCredentialBuilder {
+        private String tenantId;
+        private String clientId;
+        private String clientSecret;
+
+        public ClientSecretCredentialBuilder tenantId(String tenantId) {
+            this.tenantId = tenantId;
+            return this;
+        }
+
+        public ClientSecretCredentialBuilder clientId(String clientId) {
+            this.clientId = clientId;
+            return this;
+        }
+
+        public ClientSecretCredentialBuilder clientSecret(String clientSecret) {
+            this.clientSecret = clientSecret;
+            return this;
+        }
+
+        public ClientSecretCredential build() {
+            return new ClientSecretCredential(tenantId, clientId, clientSecret);
+        }
     }
 }
