@@ -19,3 +19,6 @@ logging:
   level:
     com.notafacil: INFO
     org.hibernate.SQL: WARN
+azure:
+  keyvault:
+    enabled: false
