@@ -46,7 +46,7 @@ logging:
 azure:
   keyvault:
     # Endpoint do seu Key Vault
-    url: ${AZURE_KEYVAULT_URL:}
+    url: ${AZURE_KEYVAULT_URL:${azure.keyvault.url:}}
     # Alias do certificado importado
     cert:
       alias: ${AZURE_KEYVAULT_CERT_ALIAS:}
