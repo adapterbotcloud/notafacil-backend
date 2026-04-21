@@ -22,16 +22,16 @@ public class AzureKeyVaultConfig {
 
     private static final Logger log = LoggerFactory.getLogger(AzureKeyVaultConfig.class);
 
-    @Value("${azure.keyvault.url}")
+    @Value("${azure.keyvault.url:}")
     private String vaultUrl;
 
-    @Value("${azure.client.id}")
+    @Value("${azure.client.id:}")
     private String clientId;
 
-    @Value("${azure.client.secret}")
+    @Value("${azure.client.secret:}")
     private String clientSecret;
 
-    @Value("${azure.tenant.id}")
+    @Value("${azure.tenant.id:}")
     private String tenantId;
 
     @Bean
@@ -50,6 +50,20 @@ public class AzureKeyVaultConfig {
     }
 
     @Bean
+    @ConditionalOnProperty(name = "azure.keyvault.enabled", havingValue = "true", matchIfMissing = false)
+    public KeyStore azureKeyVaultKeyStore() {
+        try {
+            KeyStore ks = KeyStore.getInstance("AzureKeyVault");
+            ks.load(null, null);
+            return ks;
+        } catch (Exception e) {
+            log.warn("Azure Key Vault KeyStore não pôde ser carregado: {}", e.getMessage());
+            throw new RuntimeException("Falha ao criar Azure Key Vault KeyStore", e);
+        }
+    }
+
+    @Bean
+    @ConditionalOnProperty(name = "azure.keyvault.enabled", havingValue = "true", matchIfMissing = false)
     public KeyVaultJcaProvider keyVaultProvider() {
         System.setProperty("azure.keyvault.uri", vaultUrl);
         System.setProperty("azure.keyvault.client-id", clientId);
@@ -58,23 +72,5 @@ public class AzureKeyVaultConfig {
         KeyVaultJcaProvider provider = new KeyVaultJcaProvider();
         Security.addProvider(provider);
         return provider;
-    }
-
-    @Bean
-    public KeyStore azureKeyVaultKeyStore(KeyVaultJcaProvider provider) {
-        try {
-            KeyStore ks = KeyStore.getInstance("AzureKeyVault");
-            ks.load(null, null);
-            return ks;
-        } catch (Exception e) {
-            log.warn("Azure Key Vault indisponível: {}. Certificado digital não funcionará.", e.getMessage());
-            try {
-                KeyStore ks = KeyStore.getInstance(KeyStore.getDefaultType());
-                ks.load(null, null);
-                return ks;
-            } catch (Exception ex) {
-                throw new RuntimeException("Falha ao criar KeyStore fallback", ex);
-            }
-        }
     }
 }
