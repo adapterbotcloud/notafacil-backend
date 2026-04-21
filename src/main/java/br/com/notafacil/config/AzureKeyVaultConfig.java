@@ -10,13 +10,14 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 
 import java.security.KeyStore;
 import java.security.Security;
 
-
 @Configuration
-@ConditionalOnProperty(name = "azure.keyvault.url", matchIfMissing = true)
+@Profile("!prod")
+@ConditionalOnProperty(name = "azure.keyvault.enabled", havingValue = "true", matchIfMissing = false)
 public class AzureKeyVaultConfig {
 
     private static final Logger log = LoggerFactory.getLogger(AzureKeyVaultConfig.class);
@@ -33,9 +34,11 @@ public class AzureKeyVaultConfig {
     @Value("${azure.tenant.id}")
     private String tenantId;
 
-
     @Bean
     public CertificateClient certificateClient() {
+        if (vaultUrl == null || vaultUrl.isBlank()) {
+            throw new IllegalStateException("Azure Key Vault URL is not configured");
+        }
         return new CertificateClientBuilder()
                 .vaultUrl(vaultUrl)
                 .credential(new ClientSecretCredentialBuilder()
