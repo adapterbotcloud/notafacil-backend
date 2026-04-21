@@ -16,7 +16,7 @@ import java.security.Security;
 
 
 @Configuration
-@ConditionalOnProperty(name = "azure.keyvault.url", matchIfMissing = false)
+@ConditionalOnProperty(name = "azure.keyvault.url", matchIfMissing = true)
 public class AzureKeyVaultConfig {
 
     private static final Logger log = LoggerFactory.getLogger(AzureKeyVaultConfig.class);

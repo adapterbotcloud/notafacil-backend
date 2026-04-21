@@ -11,7 +11,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 
 @RestController
 @RequestMapping("/certificates")
-@ConditionalOnProperty(name = "azure.keyvault.url", matchIfMissing = false)
+@ConditionalOnProperty(name = "azure.keyvault.url", matchIfMissing = true)
 public class CertificateImportController {
 
     private final CertificateClient certificateClient;
