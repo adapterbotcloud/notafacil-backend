@@ -16,7 +16,7 @@ import java.security.KeyStore;
 import java.security.Security;
 
 @Configuration
-@Profile("!prod")
+
 @ConditionalOnProperty(name = "azure.keyvault.enabled", havingValue = "true", matchIfMissing = false)
 public class AzureKeyVaultConfig {
 
