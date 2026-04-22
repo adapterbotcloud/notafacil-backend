@@ -2,6 +2,7 @@ package br.com.notafacil.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 
 import java.security.KeyStore;
 
@@ -9,6 +10,7 @@ import java.security.KeyStore;
 public class DefaultKeyStoreConfig {
 
     @Bean
+    @Primary
     public KeyStore defaultKeyStore() {
         try {
             KeyStore ks = KeyStore.getInstance(KeyStore.getDefaultType());
