@@ -50,7 +50,7 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOrigins(List.of("https://notafacil.adapterbot.cloud", "http://localhost:3000", "http://localhost:3001"));
+        config.setAllowedOrigins(List.of("https://notafacil.adapterbot.cloud", "https://notafacil-dev.adapterbot.cloud", "http://localhost:3000", "http://localhost:3001"));
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(List.of("*"));
         config.setAllowCredentials(true);
