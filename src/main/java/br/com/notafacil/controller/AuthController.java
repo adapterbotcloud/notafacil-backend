@@ -44,7 +44,7 @@ public class AuthController {
             return ResponseEntity.status(401).body(Map.of("message", "Usuário ou senha inválidos"));
         }
 
-        String token = jwtUtil.generateToken(user.getUsername(), user.getRole());
+        String token = jwtUtil.generateToken(user.getUsername(), user.getRole(), user.getNome(), user.getCnpj());
 
         Map<String, Object> response = new HashMap<>();
         response.put("username", user.getUsername());
