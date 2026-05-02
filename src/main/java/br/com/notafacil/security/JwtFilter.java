@@ -26,9 +26,6 @@ public class JwtFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
             throws ServletException, IOException {
 
-        String path = request.getRequestURI();
-        System.out.println(">>> JwtFilter processing: " + path);
-
         String header = request.getHeader("Authorization");
 
         if (header != null && header.startsWith("Bearer ")) {
@@ -43,24 +40,9 @@ public class JwtFilter extends OncePerRequestFilter {
                         List.of(new SimpleGrantedAuthority("ROLE_" + role))
                 );
                 SecurityContextHolder.getContext().setAuthentication(auth);
-                System.out.println(">>> JwtFilter: set auth for " + username);
-            } else {
-                System.out.println(">>> JwtFilter: invalid token");
             }
-        } else {
-            System.out.println(">>> JwtFilter: no Bearer token, passing through");
         }
 
         chain.doFilter(request, response);
-    }
-
-    @Override
-    protected boolean shouldNotFilter(HttpServletRequest request) {
-        String path = request.getRequestURI();
-        boolean skip = path.contains("/auth/") || path.contains("/actuator/") || path.contains("/swagger");
-        if (skip) {
-            System.out.println(">>> JwtFilter: skipping " + path);
-        }
-        return skip;
     }
 }
