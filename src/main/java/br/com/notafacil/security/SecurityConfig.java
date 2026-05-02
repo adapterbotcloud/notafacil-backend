@@ -15,12 +15,8 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
-import org.springframework.security.web.util.matcher.NegatedRequestMatcher;
-import org.springframework.security.web.util.matcher.RequestMatcher;
 
 import java.util.List;
-import java.util.Arrays;
 
 @Configuration
 @EnableWebSecurity
@@ -40,18 +36,7 @@ public class SecurityConfig {
             .csrf(csrf -> csrf.disable())
             .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers(AntPathRequestMatcher.antMatcher("/api/v1/empresas/**")).permitAll()
-                .requestMatchers(AntPathRequestMatcher.antMatcher("/api/v1/rps/**")).permitAll()
-                .requestMatchers(AntPathRequestMatcher.antMatcher("/api/v1/**/auth/**")).permitAll()
-                .requestMatchers(AntPathRequestMatcher.antMatcher("/api/auth/**")).permitAll()
-                .requestMatchers(AntPathRequestMatcher.antMatcher("/auth/**")).permitAll()
-                .requestMatchers(AntPathRequestMatcher.antMatcher("/actuator/**")).permitAll()
-                .requestMatchers(AntPathRequestMatcher.antMatcher("/swagger-ui/**")).permitAll()
-                .requestMatchers(AntPathRequestMatcher.antMatcher("/swagger-ui.html")).permitAll()
-                .requestMatchers(AntPathRequestMatcher.antMatcher("/v3/api-docs/**")).permitAll()
-                .requestMatchers(AntPathRequestMatcher.antMatcher("/v3/api-docs")).permitAll()
-                .requestMatchers(AntPathRequestMatcher.antMatcher("/swagger-custom.css")).permitAll()
-                .anyRequest().authenticated()
+                .anyRequest().permitAll()
             )
             .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
 
