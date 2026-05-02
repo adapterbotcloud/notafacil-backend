@@ -4,26 +4,25 @@ import br.com.notafacil.entity.Usuario;
 import br.com.notafacil.repository.UsuarioRepository;
 import br.com.notafacil.security.JwtUtil;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/auth")
+@RequestMapping("/api/v1/auth")
+@CrossOrigin(origins = {"https://notafacil.adapterbot.cloud", "https://notafacil-dev.adapterbot.cloud", "http://localhost:3000", "http://localhost:3001"})
 public class AuthController {
 
-    private final AuthenticationManager authManager;
+    private final UsuarioRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
-    private final UsuarioRepository usuarioRepo;
 
-    public AuthController(AuthenticationManager authManager, JwtUtil jwtUtil, UsuarioRepository usuarioRepo) {
-        this.authManager = authManager;
+    public AuthController(UsuarioRepository userRepository, PasswordEncoder passwordEncoder, JwtUtil jwtUtil) {
+        this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
         this.jwtUtil = jwtUtil;
-        this.usuarioRepo = usuarioRepo;
     }
 
     @PostMapping("/login")
@@ -31,32 +30,29 @@ public class AuthController {
         String username = body.get("username");
         String password = body.get("password");
 
-        try {
-            authManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
-            Usuario user = usuarioRepo.findByUsername(username).orElseThrow();
-            String token = jwtUtil.generateToken(user.getUsername(), user.getRole(), user.getNome(), user.getCnpj());
+        if (username == null || password == null) {
+            return ResponseEntity.badRequest().body(Map.of("message", "Usuário e senha são obrigatórios"));
+        }
 
-            return ResponseEntity.ok(Map.of(
-                    "token", token,
-                    "username", user.getUsername(),
-                    "nome", user.getNome(),
-                    "role", user.getRole(),
-                    "cnpj", user.getCnpj()
-            ));
-        } catch (AuthenticationException e) {
+        var userOpt = userRepository.findByUsername(username);
+        if (userOpt.isEmpty()) {
             return ResponseEntity.status(401).body(Map.of("message", "Usuário ou senha inválidos"));
         }
-    }
 
-    @GetMapping("/me")
-    public ResponseEntity<?> me(Authentication auth) {
-        if (auth == null) return ResponseEntity.status(401).body(Map.of("message", "Não autenticado"));
-        Usuario user = usuarioRepo.findByUsername(auth.getName()).orElseThrow();
-        return ResponseEntity.ok(Map.of(
-                "username", user.getUsername(),
-                "nome", user.getNome(),
-                "role", user.getRole(),
-                "cnpj", user.getCnpj()
-        ));
+        Usuario user = userOpt.get();
+        if (!passwordEncoder.matches(password, user.getPassword())) {
+            return ResponseEntity.status(401).body(Map.of("message", "Usuário ou senha inválidos"));
+        }
+
+        String token = jwtUtil.generateToken(user.getUsername(), user.getRole());
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("username", user.getUsername());
+        response.put("nome", user.getNome());
+        response.put("role", user.getRole());
+        response.put("cnpj", user.getCnpj());
+        response.put("token", token);
+
+        return ResponseEntity.ok(response);
     }
 }
