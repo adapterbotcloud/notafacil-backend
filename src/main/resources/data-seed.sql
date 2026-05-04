@@ -12,6 +12,7 @@ INSERT INTO cst_ibs_cbs (codigo, descricao, grupo, habilitado) VALUES
 ('103', 'Redução de base de cálculo', 'TRIBUTADO', true),
 ('104', 'Tributação com diferimento total', 'TRIBUTADO', true),
 ('105', 'Tributação com diferimento parcial', 'TRIBUTADO', true),
+('200', 'Alíquota reduzida', 'TRIBUTADO', true),
 ('201', 'Imunidade', 'IMUNE', true),
 ('202', 'Imunidade com crédito presumido', 'IMUNE', true),
 ('301', 'Isenção', 'ISENTO', true),
@@ -56,6 +57,7 @@ INSERT INTO classificacao_tributaria (codigo, descricao, grupo, habilitado) VALU
 ('470001', 'Serviços advocatícios e jurídicos', 'JURIDICO', true),
 ('480001', 'Serviços de limpeza e conservação', 'LIMPEZA', true),
 ('490001', 'Serviços de transporte municipal', 'TRANSPORTE', true),
+('200028', 'Fornecimento dos serviços de educação', 'EDUCACAO', true),
 ('500001', 'Serviços financeiros e bancários', 'FINANCEIRO', true)
 ON CONFLICT DO NOTHING;
 
