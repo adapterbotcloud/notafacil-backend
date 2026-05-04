@@ -111,35 +111,42 @@ public class EmpresaEntity {
     @Column(name = "substituto_tributario")
     private Boolean substitutoTributario = false;
 
-    // ─── Campos Obrigatórios v4 ────────────────────────────────────────────────
+    // ─── Campos Obrigatórios v4 (com FK para tabelas de referência) ─────────────
 
-    /** NBS - Nomenclatura Brasileira de Serviços (9 dígitos) */
+    /** NBS - Nomenclatura Brasileira de Serviços (FK → nbs.codigo) */
     @Setter @Getter
-    @NotBlank
-    @Size(max = 9)
-    @Column(name = "nbs", nullable = false, length = 9)
-    private String nbs;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "nbs", referencedColumnName = "codigo", nullable = false,
+            foreignKey = @ForeignKey(name = "fk_empresa_nbs"))
+    private NbsEntity nbsRef;
 
-    /** Indicador de Operação - código de 6 dígitos (ex: 030102) */
+    /** Indicador de Operação (FK → indicador_operacao.codigo) */
     @Setter @Getter
-    @NotBlank
-    @Size(max = 6)
-    @Column(name = "indicador_operacao", nullable = false, length = 6)
-    private String indicadorOperacao;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "indicador_operacao", referencedColumnName = "codigo", nullable = false,
+            foreignKey = @ForeignKey(name = "fk_empresa_indicador_operacao"))
+    private IndicadorOperacaoEntity indicadorOperacaoRef;
 
-    /** CST - Código Situação Tributária (3 dígitos, ex: 101) */
+    /** CST - Código Situação Tributária (FK → cst_ibs_cbs.codigo) */
     @Setter @Getter
-    @NotBlank
-    @Size(max = 3)
-    @Column(name = "cst", nullable = false, length = 3)
-    private String cst;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "cst", referencedColumnName = "codigo", nullable = false,
+            foreignKey = @ForeignKey(name = "fk_empresa_cst"))
+    private CstIbsCbsEntity cstRef;
 
-    /** Classificação Tributária completa (6 dígitos, ex: 410003) */
+    /** Classificação Tributária (FK → classificacao_tributaria.codigo) */
     @Setter @Getter
-    @NotBlank
-    @Size(max = 6)
-    @Column(name = "classificacao_tributaria", nullable = false, length = 6)
-    private String classificacaoTributaria;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "classificacao_tributaria", referencedColumnName = "codigo", nullable = false,
+            foreignKey = @ForeignKey(name = "fk_empresa_classificacao_tributaria"))
+    private ClassificacaoTributariaEntity classificacaoTributariaRef;
+
+    // ─── Convenience getters para manter compatibilidade com código existente ──
+
+    public String getNbs() { return nbsRef != null ? nbsRef.getCodigo() : null; }
+    public String getIndicadorOperacao() { return indicadorOperacaoRef != null ? indicadorOperacaoRef.getCodigo() : null; }
+    public String getCst() { return cstRef != null ? cstRef.getCodigo() : null; }
+    public String getClassificacaoTributaria() { return classificacaoTributariaRef != null ? classificacaoTributariaRef.getCodigo() : null; }
 
     // ─── Campos IBS/CBS (Reforma Tributária LC 214/2025) ───────────────────────
 
