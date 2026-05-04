@@ -113,6 +113,30 @@ public class RpsEntity {
     @Column(name = "discriminacao", length = 2000)
     private String discriminacao;
 
+    /** ID do provider que processou este RPS (GINFES, XTR_SA, PADRAO_NACIONAL) */
+    @Column(name = "provider_id", length = 50)
+    private String providerId;
+
+    /** Versão do schema usada no envio (3, 4, etc.) */
+    @Column(name = "versao_schema", length = 5)
+    private String versaoSchema;
+
+    /** Número de tentativas de envio */
+    @Column(name = "tentativas_envio")
+    private Integer tentativasEnvio = 0;
+
+    /** Número da NFS-e retornado após processamento */
+    @Column(name = "numero_nfse", length = 30)
+    private String numeroNfse;
+
+    /** Código de verificação da NFS-e */
+    @Column(name = "codigo_verificacao", length = 50)
+    private String codigoVerificacao;
+
+    /** Regime tributário: ISS ou IBS_CBS */
+    @Column(name = "regime_tributario", length = 10)
+    private String regimeTributario;
+
     /** Auditoria simples */
     @Column(name = "created_at", nullable = false)
     private OffsetDateTime createdAt;
@@ -241,4 +265,17 @@ public class RpsEntity {
     public void setMesCobranca(Integer mesCobranca) { this.mesCobranca = mesCobranca; }
     public Integer getAnoCobranca() { return anoCobranca; }
     public void setAnoCobranca(Integer anoCobranca) { this.anoCobranca = anoCobranca; }
+
+    public String getProviderId() { return providerId; }
+    public void setProviderId(String providerId) { this.providerId = providerId; }
+    public String getVersaoSchema() { return versaoSchema; }
+    public void setVersaoSchema(String versaoSchema) { this.versaoSchema = versaoSchema; }
+    public Integer getTentativasEnvio() { return tentativasEnvio; }
+    public void setTentativasEnvio(Integer tentativasEnvio) { this.tentativasEnvio = tentativasEnvio; }
+    public String getNumeroNfse() { return numeroNfse; }
+    public void setNumeroNfse(String numeroNfse) { this.numeroNfse = numeroNfse; }
+    public String getCodigoVerificacao() { return codigoVerificacao; }
+    public void setCodigoVerificacao(String codigoVerificacao) { this.codigoVerificacao = codigoVerificacao; }
+    public String getRegimeTributario() { return regimeTributario; }
+    public void setRegimeTributario(String regimeTributario) { this.regimeTributario = regimeTributario; }
 }

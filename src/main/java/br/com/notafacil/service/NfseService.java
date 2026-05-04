@@ -24,6 +24,10 @@ import java.util.UUID;
 
 import java.util.concurrent.atomic.AtomicLong; // importe o AtomicLong aqui
 
+/**
+ * @deprecated Use {@link NfseOrchestrationService} with GinfesProvider instead.
+ */
+@Deprecated
 @Service
 public class NfseService {
     private final ServiceGinfes port;

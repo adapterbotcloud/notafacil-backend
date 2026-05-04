@@ -26,6 +26,10 @@ import java.util.regex.Pattern;
  * Serviço central de emissão de NFSe.
  * Fluxo SINCRONO: persiste RPS -> enriquece/calcula -> envia em lotes -> atualiza status.
  */
+/**
+ * @deprecated Use {@link NfseOrchestrationService} with multi-provider architecture instead.
+ */
+@Deprecated
 @Service
 public class NfseService1 {
 

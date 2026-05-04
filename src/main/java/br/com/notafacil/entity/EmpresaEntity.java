@@ -141,4 +141,16 @@ public class EmpresaEntity {
     @Column(name = "classificacao_tributaria", nullable = false, length = 6)
     private String classificacaoTributaria;
 
+    // ─── Campos IBS/CBS (Reforma Tributária LC 214/2025) ───────────────────────
+
+    /** Regime tributário preferido: ISS (padrão) ou IBS_CBS */
+    @Getter @Setter
+    @Column(name = "regime_tributario_preferido", length = 10)
+    private String regimeTributarioPreferido = "ISS";
+
+    /** Flag para habilitar IBS/CBS nesta empresa */
+    @Getter @Setter
+    @Column(name = "ibs_cbs_habilitado")
+    private Boolean ibsCbsHabilitado = false;
+
 }

@@ -55,3 +55,4 @@ pom.xml.versionsBackup
 release.properties
 replay_pid*
 target/
+/docs/

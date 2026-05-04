@@ -24,6 +24,10 @@ import java.util.*;
  * Serviço de emissão de NFSe v4 - SEFIN/Ginfes.
  * Usa RecepcionarLoteRpsV4 com bloco IBS/CBS obrigatório.
  */
+/**
+ * @deprecated Use {@link NfseOrchestrationService} with GinfesProvider V4 mode instead.
+ */
+@Deprecated
 @Service
 public class NfseServiceV4 {
 

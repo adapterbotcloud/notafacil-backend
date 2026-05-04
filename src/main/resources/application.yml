@@ -34,6 +34,26 @@ server:
 nfse:
   service:
     url: ${NFSE_SERVICE_URL:http://isshomo.sefin.fortaleza.ce.gov.br/grpfor-iss/ServiceGinfesImplService}
+  lote:
+    tamanho: 50
+  providers:
+    ginfes:
+      enabled: true
+      wsdl-url: ${GINFES_WSDL_URL:https://isshomo.sefin.fortaleza.ce.gov.br/grpfor-iss/ServiceGinfesImplService?wsdl}
+      versao-schema: "3"
+    xtr-sa:
+      enabled: false
+      base-url: ${XTR_SA_BASE_URL:}
+    padrao-nacional:
+      enabled: false
+      base-url: ${PADRAO_NACIONAL_URL:}
+  municipio-mapping:
+    "2304400": "GINFES"
+  uf-defaults:
+    "23": "XTR_SA"
+  features:
+    ibs-cbs-enabled: false
+    v4-schema-enabled: false
 management:
   endpoints:
     web:

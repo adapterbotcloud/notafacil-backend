@@ -33,4 +33,10 @@ public interface RpsRepository extends JpaRepository<RpsEntity, Long> {
     @Query("UPDATE RpsEntity r SET r.status = :status, r.mensagemErro = :msg WHERE r.protocolo = :protocolo")
     void updateStatusByProtocolo(@Param("protocolo") String protocolo, @Param("status") int status, @Param("msg") String msg);
 
+    @Query("SELECT r FROM RpsEntity r WHERE r.empresa.id = :empresaId AND (r.status = 0 OR r.status = 3) AND (r.protocolo IS NULL OR r.protocolo = '')")
+    List<RpsEntity> findPendentesOuFalhosByEmpresa(@Param("empresaId") Long empresaId);
+
+    @Query("SELECT r FROM RpsEntity r WHERE r.protocolo = :protocolo")
+    List<RpsEntity> findByProtocolo(@Param("protocolo") String protocolo);
+
 }
