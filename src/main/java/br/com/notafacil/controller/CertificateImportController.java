@@ -12,7 +12,10 @@ import org.springframework.security.access.prepost.PreAuthorize;
 
 import java.security.KeyStore;
 import java.security.cert.X509Certificate;
+import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -64,6 +67,33 @@ public class CertificateImportController {
             return ResponseEntity.ok(result);
         } catch (Exception e) {
             return ResponseEntity.ok(Map.of("exists", false, "name", name));
+        }
+    }
+
+    @GetMapping("/debug/aliases")
+    public ResponseEntity<?> listAliases() {
+        try {
+            keyStore.load(null, null);
+            Enumeration<String> aliasEnum = keyStore.aliases();
+            List<Map<String, Object>> certs = new ArrayList<>();
+            while (aliasEnum.hasMoreElements()) {
+                String alias = aliasEnum.nextElement();
+                Map<String, Object> info = new HashMap<>();
+                info.put("alias", alias);
+                try {
+                    X509Certificate x509 = (X509Certificate) keyStore.getCertificate(alias);
+                    if (x509 != null) {
+                        info.put("subject", x509.getSubjectX500Principal().getName());
+                        info.put("notAfter", x509.getNotAfter().toString());
+                    }
+                } catch (Exception e) {
+                    info.put("error", e.getMessage());
+                }
+                certs.add(info);
+            }
+            return ResponseEntity.ok(certs);
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body(Map.of("error", e.getMessage()));
         }
     }
 
