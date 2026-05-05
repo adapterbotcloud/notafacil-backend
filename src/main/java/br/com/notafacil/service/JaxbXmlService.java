@@ -8,33 +8,25 @@ import java.io.StringWriter;
 import org.springframework.stereotype.Component;
 
 import br.com.notafacil.schemas.EnviarLoteRpsEnvio;
-import br.com.notafacil.schemas.v4.TcDadosIbsCbs;
-import br.com.notafacil.schemas.v4.TcDadosServicoV4;
-import br.com.notafacil.schemas.v4.TcValoresIbsCbs;
 
-/** Marshal/Unmarshal de objetos JAXB gerados dos pacotes V3 e V4 */
+/** Marshal/Unmarshal de objetos JAXB gerados do pacote V3. V4 usa string builder. */
 @Component
 public class JaxbXmlService {
 
-    private final JAXBContext ctx;
+    private final JAXBContext ctxV3;
 
     public JaxbXmlService() {
         try {
-            this.ctx = JAXBContext.newInstance(
-                EnviarLoteRpsEnvio.class,
-                TcDadosIbsCbs.class,
-                TcDadosServicoV4.class,
-                TcValoresIbsCbs.class
-            );
+            this.ctxV3 = JAXBContext.newInstance(EnviarLoteRpsEnvio.class);
         } catch (JAXBException e) {
-            throw new IllegalStateException("Falha ao inicializar JAXBContext", e);
+            throw new IllegalStateException("Falha ao inicializar JAXBContext V3", e);
         }
     }
 
     public String marshal(Object jaxbObject) {
         try {
-            Marshaller m = ctx.createMarshaller();
-            m.setProperty(Marshaller.JAXB_FRAGMENT, Boolean.TRUE); // sem <?xml ...?>
+            Marshaller m = ctxV3.createMarshaller();
+            m.setProperty(Marshaller.JAXB_FRAGMENT, Boolean.TRUE);
             m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.FALSE);
             m.setProperty(Marshaller.JAXB_ENCODING, "UTF-8");
             try (StringWriter sw = new StringWriter(4096)) {
