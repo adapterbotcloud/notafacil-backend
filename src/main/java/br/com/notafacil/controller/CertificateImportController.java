@@ -10,6 +10,10 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.security.access.prepost.PreAuthorize;
 
+import java.security.KeyStore;
+import java.security.cert.X509Certificate;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 
 @RestController
@@ -18,16 +22,18 @@ import java.util.Optional;
 public class CertificateImportController {
 
     private final Optional<CertificateClient> certificateClient;
+    private final KeyStore keyStore;
 
     @Autowired(required = false)
-    public CertificateImportController(CertificateClient certificateClient) {
+    public CertificateImportController(CertificateClient certificateClient, KeyStore keyStore) {
         this.certificateClient = Optional.of(certificateClient);
+        this.keyStore = keyStore;
     }
 
     @GetMapping("/check/{name}")
     public ResponseEntity<?> checkCertificate(@PathVariable String name) {
         if (certificateClient.isEmpty()) {
-            return ResponseEntity.ok(java.util.Map.of(
+            return ResponseEntity.ok(Map.of(
                 "available", false,
                 "message", "Azure Key Vault não configurado"
             ));
@@ -35,14 +41,29 @@ public class CertificateImportController {
         try {
             var cert = certificateClient.get().getCertificate(name);
             var props = cert.getProperties();
-            return ResponseEntity.ok(java.util.Map.of(
-                "exists", true,
-                "name", name,
-                "createdOn", props.getCreatedOn() != null ? props.getCreatedOn().toString() : "",
-                "expiresOn", props.getExpiresOn() != null ? props.getExpiresOn().toString() : ""
-            ));
+
+            Map<String, Object> result = new HashMap<>();
+            result.put("exists", true);
+            result.put("name", name);
+            result.put("createdOn", props.getCreatedOn() != null ? props.getCreatedOn().toString() : "");
+            result.put("expiresOn", props.getExpiresOn() != null ? props.getExpiresOn().toString() : "");
+
+            // Extrair subject do X509 para ver o CNPJ embutido
+            try {
+                keyStore.load(null, null);
+                X509Certificate x509 = (X509Certificate) keyStore.getCertificate(name);
+                if (x509 != null) {
+                    result.put("subject", x509.getSubjectX500Principal().getName());
+                    result.put("issuer", x509.getIssuerX500Principal().getName());
+                    result.put("serialNumber", x509.getSerialNumber().toString());
+                }
+            } catch (Exception ex) {
+                result.put("subjectError", ex.getMessage());
+            }
+
+            return ResponseEntity.ok(result);
         } catch (Exception e) {
-            return ResponseEntity.ok(java.util.Map.of("exists", false, "name", name));
+            return ResponseEntity.ok(Map.of("exists", false, "name", name));
         }
     }
 
