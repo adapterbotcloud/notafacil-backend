@@ -58,11 +58,12 @@ public class CertificateImportController {
                     .body("Azure Key Vault não configurado");
         }
         try {
+            String certName = name.startsWith("CNPJ") ? name : "CNPJ" + name;
             byte[] certBytes = file.getBytes();
-            ImportCertificateOptions options = new ImportCertificateOptions(name, certBytes)
+            ImportCertificateOptions options = new ImportCertificateOptions(certName, certBytes)
                     .setPassword(password);
             certificateClient.get().importCertificate(options);
-            return ResponseEntity.ok("Certificado importado com sucesso: " + name);
+            return ResponseEntity.ok("Certificado importado com sucesso: " + certName);
         } catch (HttpResponseException e) {
             return ResponseEntity
                     .status(e.getResponse().getStatusCode())
