@@ -7,20 +7,21 @@ import java.io.StringWriter;
 
 import org.springframework.stereotype.Component;
 
+import br.com.notafacil.schemas.EnviarLoteRpsEnvio;
 import br.com.notafacil.schemas.v4.TcDadosIbsCbs;
 import br.com.notafacil.schemas.v4.TcDadosServicoV4;
 import br.com.notafacil.schemas.v4.TcValoresIbsCbs;
 
-/** Marshal/Unmarshal de objetos JAXB gerados do pacote br.com.notafacil.schemas.v4 */
+/** Marshal/Unmarshal de objetos JAXB gerados dos pacotes V3 e V4 */
 @Component
 public class JaxbXmlService {
 
-    // Contexto criado com referências diretas às classes — não depende de package scanning
     private final JAXBContext ctx;
 
     public JaxbXmlService() {
         try {
             this.ctx = JAXBContext.newInstance(
+                EnviarLoteRpsEnvio.class,
                 TcDadosIbsCbs.class,
                 TcDadosServicoV4.class,
                 TcValoresIbsCbs.class
