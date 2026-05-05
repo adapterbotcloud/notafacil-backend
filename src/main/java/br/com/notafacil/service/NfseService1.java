@@ -243,10 +243,11 @@ public class NfseService1 {
         final EmpresaEntity emp = base.getEmpresa();
 
         final BigDecimal valorServicos = base.getValorServicos();
-        final BigDecimal aliquota      = emp.getAliquota();
+        final BigDecimal aliquotaPerc  = emp.getAliquota();
+        final BigDecimal aliquotaDecimal = aliquotaPerc.divide(new BigDecimal("100"), 6, java.math.RoundingMode.HALF_UP);
 
         final BigDecimal baseCalculo   = valorServicos.setScale(2, java.math.RoundingMode.HALF_UP);
-        final BigDecimal valorIss      = valorServicos.multiply(aliquota).setScale(2, java.math.RoundingMode.HALF_UP);
+        final BigDecimal valorIss      = valorServicos.multiply(aliquotaDecimal).setScale(2, java.math.RoundingMode.HALF_UP);
         final BigDecimal valorLiquido  = valorServicos.subtract(valorIss).setScale(2, java.math.RoundingMode.HALF_UP);
 
         final InfRpsRequestDto.ServicoRequest.ValoresRequest valoresReq = new InfRpsRequestDto.ServicoRequest.ValoresRequest(
@@ -256,7 +257,7 @@ public class NfseService1 {
                 ZERO,
                 ZERO,
                 baseCalculo,
-                aliquota.setScale(4, java.math.RoundingMode.HALF_UP),
+                aliquotaPerc.setScale(4, java.math.RoundingMode.HALF_UP),
                 valorLiquido,
                 ZERO, ZERO
         );

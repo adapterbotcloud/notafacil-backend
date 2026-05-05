@@ -120,15 +120,16 @@ public class GinfesXmlBuilder {
         EmpresaEntity emp = base.getEmpresa();
 
         BigDecimal valorServicos = base.getValorServicos();
-        BigDecimal aliquota = emp.getAliquota();
+        BigDecimal aliquotaPerc = emp.getAliquota();
+        BigDecimal aliquotaDecimal = aliquotaPerc.divide(new BigDecimal("100"), 6, RoundingMode.HALF_UP);
         BigDecimal baseCalculo = valorServicos.setScale(2, RoundingMode.HALF_UP);
-        BigDecimal valorIss = valorServicos.multiply(aliquota).setScale(2, RoundingMode.HALF_UP);
+        BigDecimal valorIss = valorServicos.multiply(aliquotaDecimal).setScale(2, RoundingMode.HALF_UP);
         BigDecimal valorLiquido = valorServicos.subtract(valorIss).setScale(2, RoundingMode.HALF_UP);
 
         var valoresReq = new InfRpsRequestDto.ServicoRequest.ValoresRequest(
                 valorServicos, ZERO, ZERO, ZERO, ZERO, ZERO, ZERO,
                 2, valorIss, ZERO, ZERO, baseCalculo,
-                aliquota.setScale(4, RoundingMode.HALF_UP),
+                aliquotaPerc.setScale(4, RoundingMode.HALF_UP),
                 valorLiquido, ZERO, ZERO
         );
 
@@ -220,8 +221,9 @@ public class GinfesXmlBuilder {
 
     private String buildRpsXmlV4(RpsEntity rps, EmpresaEntity emp) {
         BigDecimal valorServicos = rps.getValorServicos();
-        BigDecimal aliquota = emp.getAliquota();
-        BigDecimal valorIss = valorServicos.multiply(aliquota).setScale(2, RoundingMode.HALF_UP);
+        BigDecimal aliquotaPerc = emp.getAliquota();
+        BigDecimal aliquotaDecimal = aliquotaPerc.divide(new BigDecimal("100"), 6, RoundingMode.HALF_UP);
+        BigDecimal valorIss = valorServicos.multiply(aliquotaDecimal).setScale(2, RoundingMode.HALF_UP);
 
         StringBuilder sb = new StringBuilder();
         sb.append("<Rps><InfRps Id=\"Rps").append(rps.getId()).append("\">");
@@ -249,7 +251,7 @@ public class GinfesXmlBuilder {
         sb.append("<ValorIss>").append(valorIss).append("</ValorIss>");
         sb.append("<ValorIssRetido>0.00</ValorIssRetido><OutrasRetencoes>0.00</OutrasRetencoes>");
         sb.append("<BaseCalculo>").append(valorServicos.setScale(2, RoundingMode.HALF_UP)).append("</BaseCalculo>");
-        sb.append("<Aliquota>").append(aliquota.setScale(4, RoundingMode.HALF_UP)).append("</Aliquota>");
+        sb.append("<Aliquota>").append(aliquotaPerc.setScale(4, RoundingMode.HALF_UP)).append("</Aliquota>");
         sb.append("<ValorLiquidoNfse>").append(valorServicos.subtract(valorIss).setScale(2, RoundingMode.HALF_UP)).append("</ValorLiquidoNfse>");
         sb.append("<DescontoIncondicionado>0.00</DescontoIncondicionado>");
         sb.append("<DescontoCondicionado>0.00</DescontoCondicionado>");
