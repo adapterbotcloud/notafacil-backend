@@ -6,6 +6,7 @@ import br.com.notafacil.repository.EmpresaRepository;
 import br.com.notafacil.repository.RpsRepository;
 import br.com.notafacil.repository.UsuarioRepository;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
@@ -71,6 +72,29 @@ public class RpsController {
         )).collect(Collectors.toList());
 
         return ResponseEntity.ok(result);
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @PostMapping("/resetar-falhos")
+    public ResponseEntity<?> resetarFalhos(Authentication auth) {
+        if (auth == null) return ResponseEntity.status(401).build();
+
+        var usuario = usuarioRepo.findByUsername(auth.getName()).orElseThrow();
+        var empresa = empresaRepo.findByCnpj(usuario.getCnpj());
+        if (empresa.isEmpty()) return ResponseEntity.badRequest().body(Map.of("error", "Empresa não encontrada"));
+
+        List<RpsEntity> falhos = rpsRepo.findByEmpresaId(empresa.get().getId()).stream()
+                .filter(r -> r.getStatus() == RpsEntity.Status.FALHA)
+                .collect(Collectors.toList());
+
+        for (RpsEntity rps : falhos) {
+            rps.setStatus(RpsEntity.Status.PENDENTE);
+            rps.setProtocolo(null);
+            rps.setMensagemErro(null);
+        }
+        rpsRepo.saveAll(falhos);
+
+        return ResponseEntity.ok(Map.of("resetados", falhos.size()));
     }
 
     @GetMapping("/job-status")
