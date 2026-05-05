@@ -31,7 +31,7 @@ INSERT INTO indicador_operacao (codigo, descricao, habilitado) VALUES
 ('010201', 'Prestação de serviço - operação com substituição tributária - dentro do município', true),
 ('020101', 'Intermediação de serviço - operação normal - dentro do município', true),
 ('020102', 'Intermediação de serviço - operação normal - fora do município', true),
-('030101', 'Prestação de serviço a consumidor final - operação normal - dentro do município', true),
+('030101', 'Estabelecimento do fornecedor - operação normal - dentro do município', true),
 ('030102', 'Prestação de serviço a consumidor final - operação normal - fora do município', true),
 ('030201', 'Prestação de serviço a consumidor final - substituição tributária - dentro do município', true),
 ('040101', 'Exportação de serviço - operação normal', true),
@@ -81,7 +81,9 @@ INSERT INTO nbs (codigo, descricao, secao, habilitado) VALUES
 ('107011100', 'Serviços contábeis', 'Seção 1 - Profissional', true),
 ('107012100', 'Serviços advocatícios', 'Seção 1 - Profissional', true),
 ('103011100', 'Serviços de limpeza e conservação predial', 'Seção 1 - Facilidades', true),
-('104011100', 'Serviços de transporte municipal de passageiros', 'Seção 1 - Transporte', true)
+('104011100', 'Serviços de transporte municipal de passageiros', 'Seção 1 - Transporte', true),
+('122011200', 'Serviços de pré-escola', 'Seção 1 - Educação', true),
+('8511200', 'Serviços de educação infantil - pré-escola', 'Seção 1 - Educação', true)
 ON CONFLICT DO NOTHING;
 
 -- =============================================================================
