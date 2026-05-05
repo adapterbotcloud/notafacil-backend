@@ -1,16 +1,16 @@
 package br.com.notafacil.config;
 
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Primary;
 
 import java.security.KeyStore;
 
 @Configuration
+@ConditionalOnProperty(name = "azure.keyvault.enabled", havingValue = "false", matchIfMissing = true)
 public class DefaultKeyStoreConfig {
 
     @Bean
-    @Primary
     public KeyStore defaultKeyStore() {
         try {
             KeyStore ks = KeyStore.getInstance(KeyStore.getDefaultType());
