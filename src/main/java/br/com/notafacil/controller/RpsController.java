@@ -76,11 +76,18 @@ public class RpsController {
 
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/resetar-falhos")
-    public ResponseEntity<?> resetarFalhos(Authentication auth) {
+    public ResponseEntity<?> resetarFalhos(@RequestParam(required = false) String cnpj, Authentication auth) {
         if (auth == null) return ResponseEntity.status(401).build();
 
-        var usuario = usuarioRepo.findByUsername(auth.getName()).orElseThrow();
-        var empresa = empresaRepo.findByCnpj(usuario.getCnpj());
+        String targetCnpj = cnpj;
+        if (targetCnpj == null || targetCnpj.isBlank()) {
+            var usuario = usuarioRepo.findByUsername(auth.getName()).orElseThrow();
+            targetCnpj = usuario.getCnpj();
+        }
+        if (targetCnpj == null || targetCnpj.isBlank()) {
+            return ResponseEntity.badRequest().body(Map.of("error", "CNPJ não informado"));
+        }
+        var empresa = empresaRepo.findByCnpj(targetCnpj);
         if (empresa.isEmpty()) return ResponseEntity.badRequest().body(Map.of("error", "Empresa não encontrada"));
 
         List<RpsEntity> falhos = rpsRepo.findByEmpresaId(empresa.get().getId()).stream()
